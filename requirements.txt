@@ -1,0 +1,8 @@
+pandas==1.5.3
+geopandas==0.12.2
+sqlalchemy>=1.4.46
+geocube==0.3.3
+ipython
+rasterio==1.3.4
+shapely==2.0.0
+psycopg2-binary
