@@ -27,5 +27,21 @@ BEGIN
    END LOOP;
 END
 $do$
+;
 
 -- RPG
+DO
+$do$
+DECLARE
+    tbl text := 'rpg_parcelles_graphiques';
+	pkeycolname text := 'id';
+	geomcolname text := 'geom';
+BEGIN
+    RAISE NOTICE 'Table : %', tbl;
+    -- create primary key if doesn't exist
+    EXECUTE format('SELECT add_pkey_if_not_exist(%L, %L)', tbl, pkeycolname);
+    -- create spatial index if doesn't exist
+    EXECUTE format('SELECT create_geom_index_if_not_exist(%L, %L)', tbl, geomcolname);
+    RAISE NOTICE 'Pkey and % index on % done', geomcolname, tbl;
+END
+$do$
