@@ -1,27 +1,27 @@
 -- culture
 WITH
     grandes_cultures AS (
-		SELECT public.rpg_parcelles_graphiques.geom AS geom
-		FROM public.rpg_parcelles_graphiques, public.zone_etude
+		SELECT public.rpg_test.geom AS geom
+		FROM public.rpg_test, public.zone_etude
 		WHERE
-			ST_Intersects(public.rpg_parcelles_graphiques.geom, public.zone_etude.geom)
-			AND public.rpg_parcelles_graphiques.code_group IN 
+			ST_Intersects(public.rpg_test.geom, public.zone_etude.geom)
+			AND public.rpg_test.code_group IN 
 				('1', '2', '3', '4', '5', '6', '7', '8', '9',
 				'11', '14', '15', '16', '24', '25', '26', '28')
 	),
 	arboriculture AS (
-		SELECT public.rpg_parcelles_graphiques.geom AS geom
-		FROM public.rpg_parcelles_graphiques, public.zone_etude
+		SELECT public.rpg_test.geom AS geom
+		FROM public.rpg_test, public.zone_etude
 		WHERE
-			ST_Intersects(public.rpg_parcelles_graphiques.geom, public.zone_etude.geom)
-			AND public.rpg_parcelles_graphiques.code_group IN ('20', '22', '23')
+			ST_Intersects(public.rpg_test.geom, public.zone_etude.geom)
+			AND public.rpg_test.code_group IN ('20', '22', '23')
 	),
 	vigne AS (
-		SELECT public.rpg_parcelles_graphiques.geom AS geom
-		FROM public.rpg_parcelles_graphiques, public.zone_etude
+		SELECT public.rpg_test.geom AS geom
+		FROM public.rpg_test, public.zone_etude
 		WHERE
-			ST_Intersects(public.rpg_parcelles_graphiques.geom, public.zone_etude.geom)
-			AND public.rpg_parcelles_graphiques.code_group IN ('21')
+			ST_Intersects(public.rpg_test.geom, public.zone_etude.geom)
+			AND public.rpg_test.code_group IN ('21')
 	),
 	culture AS (
 		SELECT geom FROM grandes_cultures

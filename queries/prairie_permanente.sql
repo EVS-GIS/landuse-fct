@@ -1,11 +1,11 @@
 -- prairie permanente
 WITH
     prairie AS (
-		SELECT public.rpg_parcelles_graphiques.geom AS geom
-		FROM public.rpg_parcelles_graphiques, public.zone_etude
+		SELECT public.rpg_test.geom AS geom
+		FROM public.rpg_test, public.zone_etude
 		WHERE
-			ST_Intersects(public.rpg_parcelles_graphiques.geom, public.zone_etude.geom)
-			AND public.rpg_parcelles_graphiques.code_group IN ('17', '18')
+			ST_Intersects(public.rpg_test.geom, public.zone_etude.geom)
+			AND public.rpg_test.code_group IN ('17', '18')
 	),
 	clip_prairie AS (
 		SELECT ST_INTERSECTION(prairie.geom, zone_etude.geom) AS geom

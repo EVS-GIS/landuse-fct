@@ -35,7 +35,7 @@ from shapely.ops import snap
 # variables
 output_dir_name = "output"
 queries_dir_name = "queries"
-output_name = "landcover_test_zone_2021"
+output_name = "landcover_test_fct"
 layer_name = ""
 geometry_col_name = "geom"
 # list of landuse layers in the overlay order
