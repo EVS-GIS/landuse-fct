@@ -57,14 +57,45 @@ Two datasets need to be download :
 
 Install Postgresql and create a database with PostGIS extension.
 
-Import data from the datasets to the Postgresql database (example with data 2021 datasets). If zone_etude is a shapefile, it could be imported with QGIS or PostGIS Shapefile Import/Export Manager. 
+Import data from the datasets to the Postgresql database (example with data 2021 datasets). If zone_etude is a shapefile, it could be imported with QGIS or PostGIS Shapefile Import/Export Manager.
+
+SQL table to import from IGN BD TOPO :
+* BATI
+  * batiment.sql
+  * cimetiere.sql
+  * construction_lineaire.sql
+  * construction_surfacique.sql
+  * reservoir.sql
+* HYDROGRAPHIE
+  * surface_hydrographique.sql
+* TRANSPORT
+  * troncon_de_route.sql
+  * troncon_de_voie_ferree.sql
+  * piste_d_aerodrome.sql
+  * equipement_de_transport.sql
+* SERVICES_ET_ACTIVITES
+  * zone_d_activite_ou_d_interet.sql
+* OCCUPATION_DU_SOL
+  * zone_de_vegetation.sql
+* LIEUX_NOMMES
+  * zone_d_habitation.sql
+
+Geopackage data to import from RPG :
+* PARCELLES_GRAPHIQUES.gpkg
+
+Import your zone_etude layer.
 
 ```
 # Example in psql command with locahost database with BD TOPO SQL file
 
 psql -U user -d my_database -f path/to/my/data/directory/BDTOPO_3-3_TOUSTHEMES_SQL_WGS84G_FRA_2022-12-15/BDTOPO/1_DONNEES_LIVRAISON_2022-12-00160/BDT_3-3_SQL_WGS84G_FRA-ED2022-12-15/TRANSPORT/troncon_de_voie_ferree.sql -h localhost
 
-# Example in psql command with locahost database with RPG geopackage file
+# Example import RPG geopackage file to PostgreSQL/PostGIS database with gdal (could be done also with QGIS)
+ogr2ogr -f PostgreSQL PG:"dbname='my_database'" path/to/my/data/directory/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01/RPG/1_DONNEES_LIVRAISON_2021/RPG_2-0_GPKG_LAMB93_FXX_2021-01-01/PARCELLES_GRAPHIQUES.gpkg -nln "rpg_parcelles_graphiques"
+
+# Example import zone_etude.gpkg
+
+
 ```
 
 ### Workflow
