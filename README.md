@@ -94,7 +94,7 @@ psql -U user -d my_database -f path/to/my/data/directory/BDTOPO_3-3_TOUSTHEMES_S
 ogr2ogr -f PostgreSQL PG:"dbname='my_database'" path/to/my/data/directory/RPG_2-0__GPKG_LAMB93_FXX_2021-01-01/RPG/1_DONNEES_LIVRAISON_2021/RPG_2-0_GPKG_LAMB93_FXX_2021-01-01/PARCELLES_GRAPHIQUES.gpkg -nln "rpg_parcelles_graphiques"
 
 # Example import zone_etude.gpkg
-
+ogr2ogr -f PostgreSQL PG:"dbname='my_database'" path/to/my/data/directory/landuse-fct/example_inputs/zone_etude.gpkg -nln "zone_etude"
 
 ```
 
