@@ -40,7 +40,7 @@ cd Path/to/my/folder
 # copy mapdo repository with git
 git clone https://github.com/EVS-GIS/landuse-fct.git
 # create a new virtual environnement in python 3
-python3.11 -m venv env --prompt mapdo-landuse
+python3.11 -m venv env --prompt landuse-fct
 # activate your new environment
 .\env\Scripts\activate
 # update pip
