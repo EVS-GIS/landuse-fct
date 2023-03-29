@@ -26,7 +26,7 @@ from pathlib import Path
 from config.config import db_config, paths_config
 import geopandas
 import pandas
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 # rasterize geodataframe
 from geocube.api.core import make_geocube
 import rasterio.merge
@@ -52,12 +52,15 @@ queries_dir_path = os.path.join(wd_path, queries_dir_name)
 dict_df = {}
 
 # store all layer in dict as geodataframe and merge all features in one
-for layer in landcover_list:
-    query = open(os.path.join(queries_dir_path, layer + ".sql"), "r", encoding="UTF-8")
-    dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query.read(), engine.connect(), crs=2154, geom_col=geometry_col_name)
-    # merge all features
-    dict_df[layer] = dict_df[layer].dissolve()
-    dict_df[layer] = dict_df[layer].rename_geometry("geometry")
+with engine.connect() as condb:
+    for layer in landcover_list:
+        with open(os.path.join(queries_dir_path, layer + ".sql"), "r", encoding="UTF-8") as file:
+            print(file)
+            query = text(file.read())
+            dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=2154, geom_col=geometry_col_name)
+        # merge all features
+        dict_df[layer] = dict_df[layer].dissolve()
+        dict_df[layer] = dict_df[layer].rename_geometry("geometry")
 
 # do different for each layer in the overlay order
 n=1
