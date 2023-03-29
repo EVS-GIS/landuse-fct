@@ -30,7 +30,7 @@ harmonize_srid_geomcol_filename = "harmonize_srid_geom_col_name.sql"
 set_pkey_index_filename = "tables_pkey_index.sql"
 
 # pg database connexion
-params = config()
+params = db_config()
 con = f"postgresql://{params['user']}:{params['password']}@{params['host']}:{params['port']}/{params['database']}"
 engine = create_engine(con)
 
