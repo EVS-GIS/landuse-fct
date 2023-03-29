@@ -100,7 +100,7 @@ ogr2ogr -f PostgreSQL PG:"dbname='my_database'" path/to/my/data/directory/landus
 
 ### Workflow
 
-To create the landuse map, a database.ini file need to be configurate with the Postgresql database parameters created. Rename config/example_database_config.ini file to database.ini then modify the parameters with the right configuration.
+To create the landuse map, a database.ini file need to be configurate with the Postgresql database parameters created. Rename config/example_config.ini file to config.ini then modify the parameters with the right configuration.
 
 The database with datasets imported need to be prepare to set SRID, geometry columns, primary keys and spatial index before generate landuse map. In command prompt in landuse directory and with activated virtual environment.
 
