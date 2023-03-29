@@ -19,7 +19,7 @@ import os
 from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy import text
-from config.config import config
+from config.config import db_config
 
 # paths
 wd_path = Path(os.getcwd())
