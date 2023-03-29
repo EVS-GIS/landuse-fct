@@ -39,16 +39,16 @@ for queryfile in pg_utils_function:
     with engine.connect() as condb:
         with open(os.path.join(queries_utils_dir_path, queryfile), "r", encoding="UTF-8") as file:
             query = text(file.read())
-            engine.execute(query.execution_options(autocommit=True))
+            condb.execute(query.execution_options(autocommit=True))
 
 # harmonize SRID (set to 2154) and geometry column name (set to geom)
 with engine.connect() as condb:
         with open(os.path.join(queries_utils_dir_path, harmonize_srid_geomcol_filename), "r", encoding="UTF-8") as file:
             query = text(file.read())
-            engine.execute(query.execution_options(autocommit=True))
+            condb.execute(query.execution_options(autocommit=True))
 
 # create primary key and spatial index
 with engine.connect() as condb:
         with open(os.path.join(queries_utils_dir_path, set_pkey_index_filename), "r", encoding="UTF-8") as file:
             query = text(file.read())
-            engine.execute(query.execution_options(autocommit=True))
+            condb.execute(query.execution_options(autocommit=True))
