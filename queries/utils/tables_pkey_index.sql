@@ -10,9 +10,9 @@ $do$
 DECLARE
     tbl   text;
     arr text[] := array['public.batiment', 'public.construction_surfacique', 'public.cimetiere','public.reservoir',
-        'public.aerodrome', 'public.construction_lineaire', 'public.piste_d_aerodrome', 'public.surface_hydrographique',
-        'public.terrain_de_sport', 'public.troncon_de_route', 'public.troncon_de_voie_ferree', 'public.zone_de_vegetation',
-        'public.equipement_de_transport', 'public.zone_d_activite_ou_d_interet', 'public.zone_etude'];
+      'public.construction_lineaire', 'public.piste_d_aerodrome', 'public.surface_hydrographique',
+      'public.troncon_de_route', 'public.troncon_de_voie_ferree', 'public.zone_de_vegetation',
+      'public.equipement_de_transport', 'public.zone_d_activite_ou_d_interet', 'public.zone_d_habitation', 'public.zone_etude'];
 	pkeycolname text := 'cleabs';
 	geomcolname text := 'geom';
 BEGIN
