@@ -54,7 +54,7 @@ dict_df = {}
 # store all layer in dict as geodataframe and merge all features in one
 for layer in landcover_list:
     query = open(os.path.join(queries_dir_path, layer + ".sql"), "r", encoding="UTF-8")
-    dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query.read(), engine, crs=2154, geom_col=geometry_col_name)
+    dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query.read(), engine.connect(), crs=2154, geom_col=geometry_col_name)
     # merge all features
     dict_df[layer] = dict_df[layer].dissolve()
     dict_df[layer] = dict_df[layer].rename_geometry("geometry")
