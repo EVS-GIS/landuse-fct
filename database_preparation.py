@@ -35,20 +35,24 @@ con = f"postgresql://{params['user']}:{params['password']}@{params['host']}:{par
 engine = create_engine(con)
 
 # create function from utils files
-for queryfile in pg_utils_function:
-    with engine.connect() as condb:
+with engine.connect() as condb:
+    for queryfile in pg_utils_function:
         with open(os.path.join(queries_utils_dir_path, queryfile), "r", encoding="UTF-8") as file:
+            print(file)
             query = text(file.read())
-            condb.execute(query.execution_options(autocommit=True))
+            condb.execute(query)
+            condb.commit()
 
 # harmonize SRID (set to 2154) and geometry column name (set to geom)
 with engine.connect() as condb:
-        with open(os.path.join(queries_utils_dir_path, harmonize_srid_geomcol_filename), "r", encoding="UTF-8") as file:
-            query = text(file.read())
-            condb.execute(query.execution_options(autocommit=True))
+    with open(os.path.join(queries_utils_dir_path, harmonize_srid_geomcol_filename), "r", encoding="UTF-8") as file:
+        query = text(file.read())
+        condb.execute(query)
+        condb.commit()
 
 # create primary key and spatial index
 with engine.connect() as condb:
-        with open(os.path.join(queries_utils_dir_path, set_pkey_index_filename), "r", encoding="UTF-8") as file:
-            query = text(file.read())
-            condb.execute(query.execution_options(autocommit=True))
+    with open(os.path.join(queries_utils_dir_path, set_pkey_index_filename), "r", encoding="UTF-8") as file:
+        query = text(file.read())
+        condb.execute(query)
+        condb.commit()
