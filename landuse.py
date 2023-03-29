@@ -23,7 +23,7 @@ Ressources geocube :
 # import modules
 import os
 from pathlib import Path
-from config.config import config
+from config.config import db_config, paths_config
 import geopandas
 import pandas
 from sqlalchemy import create_engine
@@ -33,10 +33,7 @@ import rasterio.merge
 from shapely.ops import snap
 
 # variables
-output_dir_name = "output"
 queries_dir_name = "queries"
-output_name = "landcover_test_fct"
-layer_name = ""
 geometry_col_name = "geom"
 # list of landuse layers in the overlay order
 # zone_etude il to compute the empty cells remaining in the spatial extent
@@ -44,13 +41,13 @@ landcover_list = ["surfaces_en_eau", "banc_de_galets", "infra", "naturel",
                   "bati", "culture", "prairie_permanente", "foret", "periurbain", "zone_etude"]
 
 # pg database connexion
-params = config()
-con = f"postgresql://{params['user']}:{params['password']}@{params['host']}:{params['port']}/{params['database']}"
+db_params = db_config()
+con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
 engine = create_engine(con)
 
 # paths
+paths_params = paths_config()
 wd_path = Path(os.getcwd())
-output_dir_path = os.path.join(wd_path, output_dir_name)
 queries_dir_path = os.path.join(wd_path, queries_dir_name)
 dict_df = {}
 
@@ -92,9 +89,9 @@ diff_zone_etude.insert(0, "value", 2)
 # merge all
 merge = pandas.concat([merge, diff_zone_etude], ignore_index=True)
 merge = merge.dropna(subset=['geometry']).reset_index(drop=True)
-    
+
 # save vector
-merge.to_file(os.path.join(output_dir_path, output_name + ".gpkg"), driver="GPKG", layer="merge")
+merge.to_file(os.path.join(paths_params['outputs_dir'], paths_params['output_vector_name']), driver="GPKG", layer="merge")
 
 # rasterisation en xarray
 out_grid = make_geocube(
@@ -103,6 +100,6 @@ out_grid = make_geocube(
     resolution=(-5, 5),
 )
 # export en raster
-out_grid["value"].rio.to_raster(raster_path = os.path.join(output_dir_path, output_name + ".tif"), dtype = "uint8", nodata= 255)
+out_grid["value"].rio.to_raster(raster_path = os.path.join(paths_params['outputs_dir'], paths_params['output_raster_name']), dtype = "uint8", nodata= 255)
 
 print("end")

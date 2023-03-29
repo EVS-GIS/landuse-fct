@@ -1,5 +1,5 @@
 /output/
 __pycache__/
-database.ini
+config.ini
 
 env

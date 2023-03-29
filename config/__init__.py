@@ -1,3 +1,3 @@
 """
-Postgresql configuation
+configuation
 """
