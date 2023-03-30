@@ -1,5 +1,6 @@
-/output/
+/outputs/
 __pycache__/
 config.ini
+/test/
 
 env
