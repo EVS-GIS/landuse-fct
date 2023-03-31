@@ -24,6 +24,7 @@ Ressources geocube :
 import os
 from pathlib import Path
 from config.config import db_config, paths_config
+from tiles.tiles import CreateTileset
 import geopandas
 import pandas
 from sqlalchemy import create_engine, text
@@ -50,6 +51,11 @@ paths_params = paths_config()
 wd_path = Path(os.getcwd())
 queries_dir_path = os.path.join(wd_path, queries_dir_name)
 dict_df = {}
+
+# Create tileset from zone_etude
+CreateTileset(resolution=1000)
+
+
 
 # store all layer in dict as geodataframe and merge all features in one
 with engine.connect() as condb:

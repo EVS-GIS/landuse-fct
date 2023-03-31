@@ -98,3 +98,11 @@ def CreateTileset(resolution: float = 1000.0,
                 
                 dst.write(feature)
                 gid+=1
+
+def starcall_nokwargs(args):
+    """
+    Invoke first arg function with all other arguments.
+    """
+
+    fun = args[0]
+    return fun(*args[1:])
