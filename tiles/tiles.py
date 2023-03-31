@@ -20,7 +20,6 @@ import fiona
 import fiona.crs
 import geopandas
 from config.config import db_config, paths_config, parameters_config
-from sqlalchemy import create_engine, text
 
 def CreateTileset(resolution: float = 1000.0):
     """
@@ -61,6 +60,7 @@ def CreateTileset(resolution: float = 1000.0):
 
     # Tileset
     gx, gy = np.arange(minx, maxx, resolution), np.arange(miny, maxy, resolution)
+    tileset = os.path.join(paths['outputs_dir'], paths['output_tileset_name'])
 
     gid = 1
     with fiona.open(tileset, 'w', **options) as dst:   
