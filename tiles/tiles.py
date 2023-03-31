@@ -29,12 +29,8 @@ def CreateTileset(resolution: float = 1000.0):
     aligned with the bounding box, whereas the second tileset contains polygons that are shifted by half the 
     resolution in both the x and y directions.
 
-    :param datasource: str, default='bdalti'
-        The name of the datasource as specified in the application's configuration file.
-    :param resolution: float, default=10000.0
+    :param resolution: float, default=1000.0
         The width and height of the rectangular polygons in the tilesets.
-    :param tileset1: str, default='../inputs/10k_tileset.gpkg'
-        The filename of the first tileset to create.
     :return: None
     """
 
@@ -88,28 +84,6 @@ def CreateTileset(resolution: float = 1000.0):
                 
                 dst.write(feature)
                 gid+=1
-
-def pgenvelope_tile(
-        tile):
-
-    # pg database connexion
-    db_params = db_config()
-    con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
-    engine = create_engine(con)
-
-    with engine.connect() as condb:
-
-        
-
-from config.config import paths_config, parameters_config
-paths=paths_config()
-tileset= os.path.join(paths['outputs_dir'], 'tileset.gpkg')
-data = geopandas.read_file(tileset).iloc[:1]
-
-data.total_bounds
-
-# extract_data_tile(tile = data)
-
 
 def starcall_nokwargs(args):
     """

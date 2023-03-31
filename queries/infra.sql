@@ -31,10 +31,9 @@ WITH
                 ELSE ST_BUFFER(public.troncon_de_voie_ferree.geom, 5, 'join=bevel')
             END AS geom
         FROM
-            public.troncon_de_voie_ferree,
-            public.zone_etude
+            public.troncon_de_voie_ferree
         WHERE
-            ST_Intersects(public.troncon_de_voie_ferree.geom, public.zone_etude.geom)
+            ST_Intersects(public.troncon_de_voie_ferree.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
             AND public.troncon_de_voie_ferree.position_par_rapport_au_sol IN ('0', '1')
     ),
     infra AS (
@@ -42,8 +41,8 @@ WITH
         UNION ALL SELECT geom FROM voie_ferree
     ),
 	clip_infra AS (
-		SELECT ST_INTERSECTION(infra.geom, zone_etude.geom) AS geom
-		FROM infra, zone_etude
+		SELECT ST_INTERSECTION(infra.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		FROM infra
 	),
     parts_infra AS (
         SELECT (st_dump(st_union(geom))).geom

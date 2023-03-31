@@ -2,15 +2,15 @@
 WITH
     eau AS (
 		SELECT public.surface_hydrographique.geom AS geom
-		FROM public.surface_hydrographique, public.zone_etude
+		FROM public.surface_hydrographique
 		WHERE
-			ST_Intersects(public.surface_hydrographique.geom, public.zone_etude.geom)
+			ST_Intersects(ST_MAKEPOLYGON(ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')), public.zone_etude.geom)
 			AND public.surface_hydrographique.persistance LIKE 'Permanent'
 			AND public.surface_hydrographique.nature NOT LIKE 'Glacier, névé'
 	),
 	clip_eau AS (
-		SELECT ST_INTERSECTION(eau.geom, zone_etude.geom) AS geom
-		FROM eau, zone_etude
+		SELECT ST_INTERSECTION(eau.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		FROM eau
 	),
 	parts_eau AS (
             SELECT (st_dump(st_union(geom))).geom

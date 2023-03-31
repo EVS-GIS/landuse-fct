@@ -2,14 +2,14 @@
 WITH
     prairie AS (
 		SELECT public.rpg_test.geom AS geom
-		FROM public.rpg_test, public.zone_etude
+		FROM public.rpg_test
 		WHERE
-			ST_Intersects(public.rpg_test.geom, public.zone_etude.geom)
+			ST_Intersects(public.rpg_test.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 			AND public.rpg_test.code_group IN ('17', '18')
 	),
 	clip_prairie AS (
-		SELECT ST_INTERSECTION(prairie.geom, zone_etude.geom) AS geom
-		FROM prairie, zone_etude
+		SELECT ST_INTERSECTION(prairie.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		FROM prairie
 	),
 	parts_prairie AS (
             SELECT (st_dump(st_union(geom))).geom

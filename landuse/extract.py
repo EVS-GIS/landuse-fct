@@ -67,7 +67,8 @@ def extract_data_tile(
         for layer in landcover_tables:
             with open(os.path.join(queries_dir_path, layer + ".sql"), "r", encoding="UTF-8") as file:
                 print(file)
-                query = text(file.read())
+                minx, miny, maxx, maxy = [float(val) for val in tile.total_bounds]
+                query = text(file.read().format(minx=minx, miny=miny, maxx=maxx, maxy=maxy))
                 dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=2154, geom_col=params['pg_col_name'])
             # merge all features
             dict_df[layer] = dict_df[layer].dissolve()

@@ -2,9 +2,9 @@
 WITH
     foret AS (
 		SELECT public.zone_de_vegetation.geom AS geom
-		FROM public.zone_de_vegetation, public.zone_etude
+		FROM public.zone_de_vegetation
 		WHERE
-			ST_Intersects(public.zone_de_vegetation.geom, public.zone_etude.geom)
+			ST_Intersects(public.zone_de_vegetation.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 			AND public.zone_de_vegetation.nature IN ('Bois', 'Peupleraie', 
 													'Forêt fermée mixte',
 													'Forêt fermée de feuillus', 
@@ -19,8 +19,8 @@ WITH
 		FROM dilatation
 	),
     clip_foret AS (
-		SELECT st_intersection(erosion.geom, public.zone_etude.geom) AS geom
-		FROM erosion, public.zone_etude
+		SELECT st_intersection(erosion.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		FROM erosion
 	),
 	parts_foret AS (
             SELECT (st_dump(st_union(geom))).geom

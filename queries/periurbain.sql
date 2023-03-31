@@ -1,16 +1,16 @@
 -- periurbain
 WITH peri AS (
     SELECT public.zone_d_habitation.geom AS geom
-    FROM public.zone_d_habitation, public.zone_etude
-    WHERE ST_Intersects(public.zone_d_habitation.geom, public.zone_etude.geom)
+    FROM public.zone_d_habitation
+    WHERE ST_Intersects(public.zone_d_habitation.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 ),
 erosion AS (
     SELECT st_buffer(st_union(peri.geom), -20, 'join=bevel') AS geom
     FROM peri
 ),
 clip AS (
-    SELECT ST_INTERSECTION(erosion.geom, zone_etude.geom) AS geom
-    FROM erosion, zone_etude
+    SELECT ST_INTERSECTION(erosion.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+    FROM erosion
 ),
 parts AS (
     SELECT (st_dump(clip.geom)).geom

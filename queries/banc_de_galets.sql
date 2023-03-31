@@ -2,14 +2,14 @@
 WITH
     galet AS (
 		SELECT public.surface_hydrographique.geom AS geom
-		FROM public.surface_hydrographique, public.zone_etude
+		FROM public.surface_hydrographique
 		WHERE
-			ST_Intersects(public.surface_hydrographique.geom, public.zone_etude.geom)
+			ST_Intersects(public.surface_hydrographique.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 			AND public.surface_hydrographique.persistance LIKE 'Intermittent'
 	),
 	clip_galet AS (
-		SELECT ST_INTERSECTION(galet.geom, zone_etude.geom) AS geom
-		FROM galet, zone_etude
+		SELECT ST_INTERSECTION(galet.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		FROM galet
 	),
 	parts_galet AS (
             SELECT (st_dump(st_union(geom))).geom

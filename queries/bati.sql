@@ -2,38 +2,38 @@
 WITH
 	bati AS (
 			SELECT public.batiment.geom AS geom 
-			FROM public.batiment, public.zone_etude
-			WHERE ST_Intersects(public.batiment.geom, public.zone_etude.geom)
+			FROM public.batiment
+			WHERE ST_Intersects(public.batiment.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 		UNION 
 			SELECT public.construction_surfacique.geom AS geom 
-			FROM public.construction_surfacique, public.zone_etude
-			WHERE st_intersects(public.construction_surfacique.geom, public.zone_etude.geom)
+			FROM public.construction_surfacique
+			WHERE st_intersects(public.construction_surfacique.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 		UNION 
 			SELECT public.cimetiere.geom AS geom 
-			FROM public.cimetiere, public.zone_etude
-			WHERE st_intersects(public.cimetiere.geom, public.zone_etude.geom)
+			FROM public.cimetiere
+			WHERE st_intersects(public.cimetiere.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 		UNION 
 			SELECT public.reservoir.geom AS geom 
-			FROM public.reservoir, public.zone_etude
-			WHERE st_intersects(public.reservoir.geom, public.zone_etude.geom)
+			FROM public.reservoir
+			WHERE st_intersects(public.reservoir.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 		UNION 
 			-- polyligne, create a 2m buffer 
 			SELECT ST_BUFFER(public.construction_lineaire.geom, 2) AS geom
-			FROM public.construction_lineaire, public.zone_etude
-			WHERE st_intersects(ST_BUFFER(public.construction_lineaire.geom, 2), public.zone_etude.geom)
+			FROM public.construction_lineaire
+			WHERE st_intersects(ST_BUFFER(public.construction_lineaire.geom, 2), ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 		UNION 
 			SELECT public.piste_d_aerodrome.geom AS geom
-			FROM public.piste_d_aerodrome, public.zone_etude
-			WHERE st_intersects(public.piste_d_aerodrome.geom, public.zone_etude.geom)
+			FROM public.piste_d_aerodrome
+			WHERE st_intersects(public.piste_d_aerodrome.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 		UNION 
 			SELECT public.equipement_de_transport.geom AS geom
-			FROM public.equipement_de_transport, public.zone_etude
-			WHERE st_intersects(public.equipement_de_transport.geom, public.zone_etude.geom)
+			FROM public.equipement_de_transport
+			WHERE st_intersects(public.equipement_de_transport.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 			AND nature IN ('Parking', 'Péage')
 		UNION 
 			SELECT public.zone_d_activite_ou_d_interet.geom AS geom
-			FROM public.zone_d_activite_ou_d_interet, public.zone_etude
-			WHERE st_intersects(public.zone_d_activite_ou_d_interet.geom, public.zone_etude.geom)
+			FROM public.zone_d_activite_ou_d_interet
+			WHERE st_intersects(public.zone_d_activite_ou_d_interet.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
 			AND nature LIKE 'Usine'
 	),
 	-- closing process
@@ -50,8 +50,8 @@ WITH
 		FROM erosion
 	),
 	clip_bati AS (
-		SELECT st_intersection(buff.geom, public.zone_etude.geom) AS geom
-		FROM buff, public.zone_etude
+		SELECT st_intersection(buff.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		FROM buff
 	),
 	parts_bati AS (
 		SELECT (st_dump(clip_bati.geom)).geom
