@@ -18,11 +18,11 @@ from pathlib import Path
 import numpy as np
 import fiona
 import fiona.crs
-from config.config import db_config
+import geopandas
+from config.config import db_config, paths_config, parameters_config
 from sqlalchemy import create_engine, text
 
-def CreateTileset(resolution: float = 1000.0, 
-                  tileset1: str = './outputs/1k_tileset.gpkg'):
+def CreateTileset(resolution: float = 1000.0):
     """
     Creates one tilesets in GeoPackage format (.gpkg) with rectangular polygons that tile the bounding box of 
     the given datasource according to a resolution parameter. The first tileset contains polygons that are 
@@ -38,6 +38,10 @@ def CreateTileset(resolution: float = 1000.0,
     :return: None
     """
 
+    db_params = db_config()
+    paths = paths_config()
+    params = parameters_config()
+
     schema = { 
         'geometry': 'Polygon', 
         'properties': {'GID': 'int',
@@ -49,35 +53,21 @@ def CreateTileset(resolution: float = 1000.0,
     options = dict(
         driver='GPKG',
         schema=schema,
-        crs=fiona.crs.from_epsg(2154))
+        crs=fiona.crs.from_epsg(params['crs']))
     
-    # pg database connexion
-    params = db_config()
-    con = f"postgresql://{params['user']}:{params['password']}@{params['host']}:{params['port']}/{params['database']}"
-    engine = create_engine(con)
-
-    # extract bounding box coordinate from postgis database zone_etude table
-    with engine.connect() as condb:
-        with open(os.path.join(Path(os.getcwd()), "queries", "utils", "zone_etude_extent.sql"), "r", encoding="UTF-8") as file:
-            query = text(file.read())
-            result = condb.execute(query)
-            extent = result.fetchall()
-
-    # extract bbox values from postgis extent
-    box_str = extent[0][0]  # extract string from extent
-    box_vals = box_str.replace("BOX(", "").replace(")", "").replace(" ", ",")  # reshape string
-    box_list = box_vals.split(",")  # create list from string
-    minx, miny, maxx, maxy = [float(val) for val in box_list]  # convert to float
+    # extract bounding box coordinates from zone_etude input
+    zone_etude = geopandas.read_file(os.path.join(paths['inputs_dir'], paths['zone_etude_name']))
+    minx, miny, maxx, maxy = [float(val) for val in zone_etude.total_bounds]
 
     # add resolution to max to get the whole extent and above
     maxx += resolution
     maxy += resolution
 
-    # Tileset 1
+    # Tileset
     gx, gy = np.arange(minx, maxx, resolution), np.arange(miny, maxy, resolution)
 
     gid = 1
-    with fiona.open(tileset1, 'w', **options) as dst:   
+    with fiona.open(tileset, 'w', **options) as dst:   
         for i in range(len(gx)-1):
             for j in range(len(gy)-1):
                 
@@ -98,6 +88,28 @@ def CreateTileset(resolution: float = 1000.0,
                 
                 dst.write(feature)
                 gid+=1
+
+def pgenvelope_tile(
+        tile):
+
+    # pg database connexion
+    db_params = db_config()
+    con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
+    engine = create_engine(con)
+
+    with engine.connect() as condb:
+
+        
+
+from config.config import paths_config, parameters_config
+paths=paths_config()
+tileset= os.path.join(paths['outputs_dir'], 'tileset.gpkg')
+data = geopandas.read_file(tileset).iloc[:1]
+
+data.total_bounds
+
+# extract_data_tile(tile = data)
+
 
 def starcall_nokwargs(args):
     """
