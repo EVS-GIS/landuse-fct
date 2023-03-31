@@ -33,7 +33,7 @@ WITH
         FROM
             public.troncon_de_voie_ferree
         WHERE
-            ST_Intersects(public.troncon_de_voie_ferree.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'))
+            ST_Intersects(public.troncon_de_voie_ferree.geom, ST_POLYGON('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'::geometry, 2154))
             AND public.troncon_de_voie_ferree.position_par_rapport_au_sol IN ('0', '1')
     ),
     infra AS (
@@ -41,7 +41,7 @@ WITH
         UNION ALL SELECT geom FROM voie_ferree
     ),
 	clip_infra AS (
-		SELECT ST_INTERSECTION(infra.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		SELECT ST_INTERSECTION(infra.geom, ST_POLYGON('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'::geometry, 2154)) AS geom
 		FROM infra
 	),
     parts_infra AS (

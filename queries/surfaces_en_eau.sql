@@ -4,12 +4,12 @@ WITH
 		SELECT public.surface_hydrographique.geom AS geom
 		FROM public.surface_hydrographique
 		WHERE
-			ST_Intersects(ST_MAKEPOLYGON(ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')), public.zone_etude.geom)
+			ST_Intersects(public.surface_hydrographique.geom, ST_POLYGON('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'::geometry, 2154))
 			AND public.surface_hydrographique.persistance LIKE 'Permanent'
 			AND public.surface_hydrographique.nature NOT LIKE 'Glacier, névé'
 	),
 	clip_eau AS (
-		SELECT ST_INTERSECTION(eau.geom, ST_GeomFromText('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})')) AS geom
+		SELECT ST_INTERSECTION(eau.geom, ST_POLYGON('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'::geometry, 2154)) AS geom
 		FROM eau
 	),
 	parts_eau AS (

@@ -69,14 +69,9 @@ def extract_data_tile(
                 print(file)
                 minx, miny, maxx, maxy = [float(val) for val in tile.total_bounds]
                 query = text(file.read().format(minx=minx, miny=miny, maxx=maxx, maxy=maxy))
-                dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=2154, geom_col=params['pg_col_name'])
+                dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=params['crs'], geom_col=params['pg_col_name'])
             # merge all features
             dict_df[layer] = dict_df[layer].dissolve()
             dict_df[layer] = dict_df[layer].rename_geometry("geometry")
     
     return dict_df
-
-# tileset= os.path.join(paths['outputs_dir'], 'tileset.gpkg')
-# data = geopandas.read_file(tileset).iloc[:1]
-# extract_data_tile(tile = data)
-
