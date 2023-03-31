@@ -95,5 +95,4 @@ def extract_data_tile(
     # Return the dictionary containing the extracted data
     return dict_df
 
-
-def rasterize_tile():
+# A continuer directement avec a rasterisation
