@@ -53,25 +53,47 @@ def extract_data(
         pooled = pool.imap_unordered(starcall_nokwargs, arguments)
 
 def extract_data_tile(
-        db_con_params = db_params,
-        tile = 1,
-        landcover_tables = params['landcover_tables'],
-        queries_dir_path = paths['query_dir_path'],
-        tables_names = params['landcover_tables']):
+    tile=1,  # The tile to extract data from
+    db_con_params: dict = db_params,  # The parameters to connect to the PostgreSQL database
+    landcover_tables: list = params['landcover_tables'],  # A list of landcover tables to extract data from
+    queries_dir_path: str = paths['query_dir_path'],  # The path to the directory containing the SQL query files
+    tables_names: str = params['landcover_tables']  # The names of the tables to extract data from
+) -> dict:
+    """
+    Extract PostGIS data from a tile.
+
+    :param tile: A GeoPandas GeoDataFrame object representing the tile from the tileset to extract data from.
+    :param db_con_params: A dictionary containing the parameters required to connect to the PostgreSQL database.
+    :param landcover_tables: A list of strings representing the names of the landcover tables to extract data from.
+    :param queries_dir_path: A string representing the path to the directory containing the SQL query files.
+    :param tables_names: A string representing the names of the tables to extract data from.
+    :return: A dictionary containing the extracted data.
+    """
     
+    # Construct a connection string to the PostgreSQL database using the provided database parameters
     con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
+    # Create a SQLAlchemy engine to connect to the database
     engine = create_engine(con)
 
+    # Create an empty dictionary to store the extracted data
     dict_df = {}
+    # Connect to the database and extract data from each landcover table
     with engine.connect() as condb:
         for layer in landcover_tables:
+            # Open the SQL query file for the current landcover table
             with open(os.path.join(queries_dir_path, layer + ".sql"), "r", encoding="UTF-8") as file:
-                print(file)
+                # Read the contents of the query file and replace the bounding box placeholders with the actual bounding box values
                 minx, miny, maxx, maxy = [float(val) for val in tile.total_bounds]
                 query = text(file.read().format(minx=minx, miny=miny, maxx=maxx, maxy=maxy))
+                # Extract the data from the database using the current query and store it in a GeoDataFrame
                 dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=params['crs'], geom_col=params['pg_col_name'])
-            # merge all features
+            # Merge all features in the GeoDataFrame
             dict_df[layer] = dict_df[layer].dissolve()
+            # Rename the geometry column to "geometry"
             dict_df[layer] = dict_df[layer].rename_geometry("geometry")
     
+    # Return the dictionary containing the extracted data
     return dict_df
+
+
+def rasterize_tile():

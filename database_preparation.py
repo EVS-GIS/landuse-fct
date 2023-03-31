@@ -17,8 +17,7 @@ Warning, the operation could be time consuming if you have loaded the whole Fran
 # import modules
 import os
 from pathlib import Path
-from sqlalchemy import create_engine
-from sqlalchemy import text
+from sqlalchemy import create_engine, text
 from config.config import db_config
 
 # paths
