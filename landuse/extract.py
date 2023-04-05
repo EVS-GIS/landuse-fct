@@ -16,7 +16,7 @@ DOCME
 import os
 from multiprocessing import Pool
 from pathlib import Path
-from config.config import db_config, paths_config, parameters_config, raster_config
+# from config.config import db_config, paths_config, parameters_config
 import geopandas
 from sqlalchemy import create_engine, text
 from tiles.tiles import starcall_nokwargs
@@ -25,18 +25,18 @@ from rasterio import Affine
 import numpy
 from rasterio import features
 import click
+from osgeo import gdal
 
 # parameters
-paths = paths_config()
-params = parameters_config()
-db_params = db_config()
-rast_params = raster_config()
+# paths = paths_config()
+# params = parameters_config()
+# db_params = db_config()
 
-tileset= os.path.join(paths['outputs_dir'], 'tileset.gpkg')
-db_con_params: dict = db_params
-landcover_tables: list = params['landcover_tables']
-queries_dir_path: str = paths['query_dir_path']
-tables_names: str = params['landcover_tables'] 
+# tileset= os.path.join(paths['outputs_dir'], 'tileset.gpkg')
+# db_con_params: dict = db_params
+# landcover_tables: list = params['landcover_tables']
+# queries_dir_path: str = paths['query_dir_path']
+# tables_names: str = params['landcover_tables'] 
 
 # tile  = geopandas.read_file(tileset).iloc[:1]
 
@@ -52,21 +52,36 @@ tables_names: str = params['landcover_tables']
 
 # create_vrt_raster(paths['tiles_dir'], os.path.join(paths['outputs_dir'], paths['output_raster_name']))
 
+
+
+# PAS COMPATIBLE AVEC WINDOWS!
 def extract_data(
-        tileset: str = './outputs/tileset.gpkg',  # tileset path,
-        processes: int = 1 # number of processes
+        tileset: str = 'tileset.gpkg',  # tileset path,
+        processes: int = 1, # number of processes
+        outputs_dir: str = './outputs/',
+        tile_dir: str = './outputs/landuse/',
+        resolution: int = 5,
+        db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
+        queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
+        landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
+        crs: str = '2154'
         ):
     
     # pg database connexion
 
     def arguments():
         
-        for gid in geopandas.read_file(tileset)['GID']:
+        for gid in geopandas.read_file(os.path.join(outputs_dir, tileset))['GID']:
             yield (
                 extract_data_tile,
                 gid,
-                os.path.join(paths['outputs_dir'], paths['output_tileset_name']),
-                rast_params['resolution']
+                os.path.join(outputs_dir, tileset),
+                tile_dir,
+                resolution,
+                db_params,
+                queries_dir_path,
+                landcover_tables,
+                crs
             )
 
     arguments = list(arguments())
@@ -82,7 +97,12 @@ def extract_data(
 def extract_data_tile(
     gid: int = 1, # tile index
     tileset: str = './outputs/tileset.gpkg',  # tileset path
-    resolution: int = rast_params['resolution'] # outupt raster resolution
+    resolution: int = 5, # outupt raster resolution
+    tile_dir: str = './outputs/landuse/',
+    db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
+    queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
+    landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
+    crs: str = '2154'
 ):
     """
     Extract PostGIS data from a tile.
@@ -93,9 +113,6 @@ def extract_data_tile(
     :param resolution: an integer with the output raster resolution.
     :return: A raster containing the tile landuse.
     """
-
-    landcover_tables = params['landcover_tables']  # A list of landcover tables to extract data from
-    queries_dir_path = paths['query_dir_path']  # The path to the directory containing the SQL query files
 
     # read 
     dataset = geopandas.read_file(tileset)
@@ -118,7 +135,7 @@ def extract_data_tile(
                 minx, miny, maxx, maxy = [float(val) for val in tile.total_bounds]
                 query = text(file.read().format(minx=minx, miny=miny, maxx=maxx, maxy=maxy))
                 # Extract the data from the database using the current query and store it in a GeoDataFrame
-                dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=params['crs'], geom_col=params['pg_col_name'])
+                dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=crs, geom_col='geom')
             # Merge all features in the GeoDataFrame
             dict_df[layer] = dict_df[layer].dissolve()
             # Rename the geometry column to "geometry"
@@ -126,11 +143,11 @@ def extract_data_tile(
     
     # create raser from the layers
     create_raster(geodataframe = tile, layers_dict = dict_df, 
-                  raster_path = os.path.join(paths['tiles_dir'], 'LANDUSE_'+id+'.tiff'), 
-                  cell_size = resolution, default_value=2)
+                  raster_path = os.path.join(tile_dir, 'LANDUSE_'+id+'.tif'), 
+                  resolution = resolution, default_value=2)
 
-def create_raster(geodataframe, layers_dict, raster_path, cell_size = rast_params['resolution'], default_value=2):
-    cell_size = int(cell_size)
+def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154'):
+    cell_size = int(resolution)
     # Obtenez l'emprise du GeoDataFrame
     bounds = geodataframe.total_bounds
     xmin, ymin, xmax, ymax = bounds
@@ -140,7 +157,7 @@ def create_raster(geodataframe, layers_dict, raster_path, cell_size = rast_param
     rows = int((ymax - ymin) / cell_size)
 
     # Créez la transformation affine
-    transform = Affine.translation(xmin, ymax) * Affine.scale(cell_size, -cell_size)
+    transform = Affine.translation(xmin, ymax) * Affine.scale(resolution, -resolution)
 
     profile = {
         'driver': 'GTiff',
@@ -150,7 +167,7 @@ def create_raster(geodataframe, layers_dict, raster_path, cell_size = rast_param
         'count': 1,
         'height': rows,
         'width': cols,
-        'crs': 'EPSG:'+params['crs'],
+        'crs': 'EPSG:'+ crs,
         'transform': transform,
         'dtype': rasterio.uint8
     }
@@ -175,9 +192,9 @@ def create_raster(geodataframe, layers_dict, raster_path, cell_size = rast_param
 
 # create_raster(tile, os.path.join(paths['outputs_dir'], paths['output_raster_name']), 5, 2)
 
-def create_vrt_raster(input_dir, output_vrt):
+def create_vrt_raster(tiles_dir, output_vrt):
     # Liste des fichiers GeoTIFF dans le répertoire d'entrée
-    tiff_files = [os.path.join(input_dir, f) for f in os.listdir(input_dir) if f.endswith('.tif')]
+    tiff_files = [os.path.join(tiles_dir, f) for f in os.listdir(tiles_dir) if f.endswith('.tif')]
 
     # Trier les fichiers GeoTIFF par ordre numérique de leur nom
     tiff_files.sort(key=lambda x: int(os.path.basename(x).split('_')[-1].split('.')[0]))

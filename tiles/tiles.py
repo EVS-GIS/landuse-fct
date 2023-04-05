@@ -13,15 +13,15 @@ DOCME
 ***************************************************************************
 """
 
-import os
-from pathlib import Path
 import numpy as np
 import fiona
 import fiona.crs
 import geopandas
-from config.config import db_config, paths_config, parameters_config
 
-def CreateTileset(resolution: float = 1000.0):
+def CreateTileset(tile_size: float = 1000.0,
+                  zone_etude_path: str = './inputs/zone_etude.gpkg',
+                  tileset_path: str = './outputs/tileset.gpkg',
+                  crs = '2154'):
     """
     Creates one tilesets in GeoPackage format (.gpkg) with rectangular polygons that tile the bounding box of 
     the given datasource according to a resolution parameter. The first tileset contains polygons that are 
@@ -32,10 +32,6 @@ def CreateTileset(resolution: float = 1000.0):
         The width and height of the rectangular polygons in the tilesets.
     :return: None
     """
-
-    db_params = db_config()
-    paths = paths_config()
-    params = parameters_config()
 
     schema = { 
         'geometry': 'Polygon', 
@@ -48,19 +44,19 @@ def CreateTileset(resolution: float = 1000.0):
     options = dict(
         driver='GPKG',
         schema=schema,
-        crs=fiona.crs.from_epsg(params['crs']))
+        crs=fiona.crs.from_epsg(crs))
     
     # extract bounding box coordinates from zone_etude input
-    zone_etude = geopandas.read_file(os.path.join(paths['inputs_dir'], paths['zone_etude_name']))
+    zone_etude = geopandas.read_file(zone_etude_path)
     minx, miny, maxx, maxy = [float(val) for val in zone_etude.total_bounds]
 
     # add resolution to max to get the whole extent and above
-    maxx += resolution
-    maxy += resolution
+    maxx += tile_size
+    maxy += tile_size
 
     # Tileset
-    gx, gy = np.arange(minx, maxx, resolution), np.arange(miny, maxy, resolution)
-    tileset = os.path.join(paths['outputs_dir'], paths['output_tileset_name'])
+    gx, gy = np.arange(minx, maxx, tile_size), np.arange(miny, maxy, tile_size)
+    tileset = tileset_path
 
     gid = 1
     with fiona.open(tileset, 'w', **options) as dst:   
