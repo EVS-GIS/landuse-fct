@@ -1,7 +1,7 @@
 import os
 from config.config import db_config, paths_config, parameters_config
 from tiles.tiles import CreateTileset
-from landuse.extract import multiprocess_landuse, landuse_tile, create_vrt_raster
+from landuse.extract import multiprocess_landuse, landuse_tile
 
 # parameters
 paths = paths_config()
