@@ -30,9 +30,8 @@ CreateTileset(
 
 
 # create landuse raster
-extract_data(tileset = os.path.join(paths['outputs_dir'], paths['output_tileset_name']), 
+extract_data(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
              processes = processes,
-             outputs_dir = paths['outputs_dir'],
              tile_dir = paths['tiles_dir'],
              resolution = params['resolution'],
              db_params = db_params,

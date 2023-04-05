@@ -58,7 +58,6 @@ from osgeo import gdal
 def extract_data(
         tileset: str = 'tileset.gpkg',  # tileset path,
         processes: int = 1, # number of processes
-        outputs_dir: str = './outputs/',
         tile_dir: str = './outputs/landuse/',
         resolution: int = 5,
         db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
@@ -71,11 +70,11 @@ def extract_data(
 
     def arguments():
         
-        for gid in geopandas.read_file(os.path.join(outputs_dir, tileset))['GID']:
+        for gid in geopandas.read_file(tileset)['GID']:
             yield (
                 extract_data_tile,
                 gid,
-                os.path.join(outputs_dir, tileset),
+                tileset,
                 tile_dir,
                 resolution,
                 db_params,
