@@ -1,11 +1,11 @@
 -- prairie permanente
 WITH
     prairie AS (
-		SELECT public.rpg_test.geom AS geom
-		FROM public.rpg_test
+		SELECT public.rpg_parcelles_graphiques.geom AS geom
+		FROM public.rpg_parcelles_graphiques
 		WHERE
-			ST_Intersects(public.rpg_test.geom, ST_POLYGON('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'::geometry, 2154))
-			AND public.rpg_test.code_group IN ('17', '18')
+			ST_Intersects(public.rpg_parcelles_graphiques.geom, ST_POLYGON('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'::geometry, 2154))
+			AND public.rpg_parcelles_graphiques.code_group IN ('17', '18')
 	),
 	clip_prairie AS (
 		SELECT ST_INTERSECTION(prairie.geom, ST_POLYGON('LINESTRING({minx} {miny},{maxx} {miny},{maxx} {maxy}, {minx} {maxy}, {minx} {miny})'::geometry, 2154)) AS geom
