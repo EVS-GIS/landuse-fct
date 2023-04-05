@@ -55,7 +55,7 @@ from osgeo import gdal
 
 
 # PAS COMPATIBLE AVEC WINDOWS!
-def extract_data(
+def multiprocess_landuse(
         tileset: str = 'tileset.gpkg',  # tileset path,
         processes: int = 1, # number of processes
         tile_dir: str = './outputs/landuse/',
@@ -72,7 +72,7 @@ def extract_data(
         
         for gid in geopandas.read_file(tileset)['GID']:
             yield (
-                extract_data_tile,
+                landuse_tile,
                 gid,
                 tileset,
                 tile_dir,
@@ -93,7 +93,7 @@ def extract_data(
                 for _ in iterator:
                     pass
 
-def extract_data_tile(
+def landuse_tile(
     gid: int = 1, # tile index
     tileset: str = './outputs/tileset.gpkg',  # tileset path
     resolution: int = 5, # outupt raster resolution

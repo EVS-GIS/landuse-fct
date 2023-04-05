@@ -1,7 +1,7 @@
 import os
 from config.config import db_config, paths_config, parameters_config
 from tiles.tiles import CreateTileset
-from landuse.extract import extract_data, extract_data_tile, create_vrt_raster
+from landuse.extract import multiprocess_landuse, landuse_tile, create_vrt_raster
 
 # parameters
 paths = paths_config()
@@ -18,7 +18,7 @@ CreateTileset(
     tileset_path = os.path.join(paths['outputs_dir'], paths['tileset_name']),
     crs = params['crs'])
 
-# extract_data_tile(
+# landuse_tile(
 #     gid = 3, # tile index
 #     tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']),  # tileset path
 #     resolution = params['resolution'], # outupt raster resolution
@@ -30,7 +30,7 @@ CreateTileset(
 
 
 # create landuse raster
-extract_data(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
+multiprocess_landuse(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
              processes = processes,
              tile_dir = paths['tiles_dir'],
              resolution = params['resolution'],
