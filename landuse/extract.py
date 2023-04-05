@@ -25,7 +25,7 @@ from rasterio import Affine
 import numpy
 from rasterio import features
 import click
-from osgeo import gdal
+# from osgeo import gdal
 
 # parameters
 # paths = paths_config()
