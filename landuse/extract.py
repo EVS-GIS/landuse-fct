@@ -191,18 +191,18 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
 
 # create_raster(tile, os.path.join(paths['outputs_dir'], paths['output_raster_name']), 5, 2)
 
-def create_vrt_raster(tiles_dir, output_vrt):
-    # Liste des fichiers GeoTIFF dans le répertoire d'entrée
-    tiff_files = [os.path.join(tiles_dir, f) for f in os.listdir(tiles_dir) if f.endswith('.tif')]
+# def create_vrt_raster(tiles_dir, output_vrt):
+#     # Liste des fichiers GeoTIFF dans le répertoire d'entrée
+#     tiff_files = [os.path.join(tiles_dir, f) for f in os.listdir(tiles_dir) if f.endswith('.tif')]
 
-    # Trier les fichiers GeoTIFF par ordre numérique de leur nom
-    tiff_files.sort(key=lambda x: int(os.path.basename(x).split('_')[-1].split('.')[0]))
+#     # Trier les fichiers GeoTIFF par ordre numérique de leur nom
+#     tiff_files.sort(key=lambda x: int(os.path.basename(x).split('_')[-1].split('.')[0]))
 
-    # Créer un fichier raster virtuel à partir des fichiers GeoTIFF
-    vrt_options = gdal.BuildVRTOptions(resampleAlg='nearest')
-    vrt = gdal.BuildVRT(output_vrt, tiff_files, options=vrt_options)
+#     # Créer un fichier raster virtuel à partir des fichiers GeoTIFF
+#     vrt_options = gdal.BuildVRTOptions(resampleAlg='nearest')
+#     vrt = gdal.BuildVRT(output_vrt, tiff_files, options=vrt_options)
 
-    # Fermer le fichier raster virtuel
-    vrt = None
+#     # Fermer le fichier raster virtuel
+#     vrt = None
 
-    print('Raster virtuel créé avec succès :', output_vrt)
+#     print('Raster virtuel créé avec succès :', output_vrt)
