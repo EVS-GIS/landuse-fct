@@ -25,34 +25,6 @@ from rasterio import Affine
 import numpy
 from rasterio import features
 import click
-# from osgeo import gdal
-
-# parameters
-# paths = paths_config()
-# params = parameters_config()
-# db_params = db_config()
-
-# tileset= os.path.join(paths['outputs_dir'], 'tileset.gpkg')
-# db_con_params: dict = db_params
-# landcover_tables: list = params['landcover_tables']
-# queries_dir_path: str = paths['query_dir_path']
-# tables_names: str = params['landcover_tables'] 
-
-# tile  = geopandas.read_file(tileset).iloc[:1]
-
-# for gid in geopandas.read_file(tileset)['GID']:
-#     print(gid)
-
-# max(geopandas.read_file(tileset)['GID'])
-# geopandas.read_file(tileset)['GID'] == 1
-# test = geopandas.read_file(tileset)
-# test2 = test[test['GID']==1]
-
-# extract_data(tileset = os.path.join(paths['outputs_dir'], paths['output_tileset_name']), processes = 1)
-
-# create_vrt_raster(paths['tiles_dir'], os.path.join(paths['outputs_dir'], paths['output_raster_name']))
-
-
 
 # PAS COMPATIBLE AVEC WINDOWS!
 def multiprocess_landuse(
@@ -190,21 +162,3 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
                 data[mask] = raster[mask]
         # Écrire le tableau sur le raster
         dst.write(data, 1)
-
-# create_raster(tile, os.path.join(paths['outputs_dir'], paths['output_raster_name']), 5, 2)
-
-# def create_vrt_raster(tiles_dir, output_vrt):
-#     # Liste des fichiers GeoTIFF dans le répertoire d'entrée
-#     tiff_files = [os.path.join(tiles_dir, f) for f in os.listdir(tiles_dir) if f.endswith('.tif')]
-
-#     # Trier les fichiers GeoTIFF par ordre numérique de leur nom
-#     tiff_files.sort(key=lambda x: int(os.path.basename(x).split('_')[-1].split('.')[0]))
-
-#     # Créer un fichier raster virtuel à partir des fichiers GeoTIFF
-#     vrt_options = gdal.BuildVRTOptions(resampleAlg='nearest')
-#     vrt = gdal.BuildVRT(output_vrt, tiff_files, options=vrt_options)
-
-#     # Fermer le fichier raster virtuel
-#     vrt = None
-
-#     print('Raster virtuel créé avec succès :', output_vrt)
