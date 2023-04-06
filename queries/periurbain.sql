@@ -19,4 +19,4 @@ parts AS (
 SELECT row_number() over() AS gid, 6 AS value, removeHoles(geom, 500) AS geom
 FROM parts
 WHERE ST_GeometryType(geom)='ST_Polygon'
-AND ST_AREA(geom)>=2500
+AND ST_AREA(geom)>=2500;

@@ -38,4 +38,4 @@ WITH
 	)
 	SELECT row_number() over() AS gid, 5 AS value, removeHoles(geom, 500) AS geom
 	FROM parts_culture
-	WHERE ST_GeometryType(geom) = 'ST_Polygon'
+	WHERE ST_GeometryType(geom) = 'ST_Polygon';

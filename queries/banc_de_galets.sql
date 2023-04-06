@@ -17,4 +17,4 @@ WITH
 	)
 	SELECT row_number() over() AS gid, 1 as value, geom
 	FROM parts_galet
-	WHERE ST_GeometryType(geom) = 'ST_Polygon'
+	WHERE ST_GeometryType(geom) = 'ST_Polygon';

@@ -18,4 +18,4 @@ WITH
 	)
 	SELECT row_number() over() AS gid, 0 as value, geom
 	FROM parts_eau
-	WHERE ST_GeometryType(geom) = 'ST_Polygon'
+	WHERE ST_GeometryType(geom) = 'ST_Polygon';

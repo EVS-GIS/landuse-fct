@@ -29,4 +29,4 @@ WITH
 	SELECT row_number() over() AS gid, 3 AS value, removeHoles(geom, 500) AS geom
 	FROM parts_foret
 	WHERE ST_GeometryType(geom) = 'ST_Polygon'
-		AND ST_AREA(geom) >=2500
+		AND ST_AREA(geom) >=2500;

@@ -18,4 +18,4 @@ WITH
 	)
 	SELECT row_number() over() AS gid, 2 AS value, removeHoles(geom, 500) AS geom
 	FROM parts_naturel
-	WHERE ST_GeometryType(geom) = 'ST_Polygon'
+	WHERE ST_GeometryType(geom) = 'ST_Polygon';

@@ -49,4 +49,4 @@ WITH
     )
 	SELECT row_number() over() AS gid, 8 AS value, removeHoles(geom, 500) as geom
 	FROM parts_infra
-	WHERE ST_GeometryType(geom) = 'ST_Polygon'
+	WHERE ST_GeometryType(geom) = 'ST_Polygon';

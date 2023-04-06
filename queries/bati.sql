@@ -60,4 +60,4 @@ WITH
 	SELECT row_number() over() AS gid, 7 as value, removeHoles(geom, 2000) as geom
 	FROM parts_bati
 	WHERE ST_GeometryType(geom) = 'ST_Polygon'
-		AND ST_AREA(geom) >=2500
+		AND ST_AREA(geom) >=2500;
