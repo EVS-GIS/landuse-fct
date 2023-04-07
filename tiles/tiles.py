@@ -17,6 +17,7 @@ import numpy as np
 import fiona
 import fiona.crs
 import geopandas
+from shapely.geometry import Polygon
 
 def CreateTileset(tile_size: float = 1000.0,
                   zone_etude_path: str = './inputs/zone_etude.gpkg',
@@ -78,8 +79,15 @@ def CreateTileset(tile_size: float = 1000.0,
                            }
                     }
                 
+                # write only features if intersect with zone_etude
+                if zone_etude.intersects(Polygon(coordinates)).any()==True:
+                    dst.write(feature)
+                    gid+=1
+                
                 dst.write(feature)
                 gid+=1
+
+zone_etude.intersects(Polygon(coordinates))
 
 def starcall_nokwargs(args):
     """
