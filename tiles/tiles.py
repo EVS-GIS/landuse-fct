@@ -87,8 +87,6 @@ def CreateTileset(tile_size: float = 1000.0,
                 dst.write(feature)
                 gid+=1
 
-zone_etude.intersects(Polygon(coordinates))
-
 def starcall_nokwargs(args):
     """
     Invoke first arg function with all other arguments.
