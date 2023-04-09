@@ -89,35 +89,42 @@ def landuse_tile(
     dataset = geopandas.read_file(tileset)
     tile = dataset[dataset['GID']==gid]
     id = f"{gid:05d}"
+    raster_path = raster_path = os.path.join(tile_dir, 'LANDUSE_'+id+'.tif')
 
-    # Construct a connection string to the PostgreSQL database using the provided database parameters
-    con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
-    # Create a SQLAlchemy engine to connect to the database
-    engine = create_engine(con)
+    if os.path.exists(raster_path):
 
-    # Create an empty dictionary to store the extracted data
-    dict_df = {}
-    # Connect to the database and extract data from each landcover table
-    with engine.connect() as condb:
-        for layer in landcover_tables:
-            # Open the SQL query file for the current landcover table
-            with open(os.path.join(queries_dir_path, layer + ".sql"), "r", encoding="UTF-8") as file:
-                # Read the contents of the query file and replace the bounding box placeholders with the actual bounding box values
-                minx, miny, maxx, maxy = [float(val) for val in tile.total_bounds]
-                query = text(file.read().format(minx=minx, miny=miny, maxx=maxx, maxy=maxy))
-                # Extract the data from the database using the current query and store it in a GeoDataFrame
-                dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=crs, geom_col='geom')
-            # Merge all features in the GeoDataFrame
-            dict_df[layer] = dict_df[layer].dissolve()
-            # Rename the geometry column to "geometry"
-            dict_df[layer] = dict_df[layer].rename_geometry("geometry")
-    # close connection
-    engine.dispose()
-    
-    # create raser from the layers
-    create_raster(geodataframe = tile, layers_dict = dict_df, 
-                  raster_path = os.path.join(tile_dir, 'LANDUSE_'+id+'.tif'), 
-                  resolution = resolution, default_value=2)
+        pass
+
+    else:
+        
+        # Construct a connection string to the PostgreSQL database using the provided database parameters
+        con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
+        # Create a SQLAlchemy engine to connect to the database
+        engine = create_engine(con)
+
+        # Create an empty dictionary to store the extracted data
+        dict_df = {}
+        # Connect to the database and extract data from each landcover table
+        with engine.connect() as condb:
+            for layer in landcover_tables:
+                # Open the SQL query file for the current landcover table
+                with open(os.path.join(queries_dir_path, layer + ".sql"), "r", encoding="UTF-8") as file:
+                    # Read the contents of the query file and replace the bounding box placeholders with the actual bounding box values
+                    minx, miny, maxx, maxy = [float(val) for val in tile.total_bounds]
+                    query = text(file.read().format(minx=minx, miny=miny, maxx=maxx, maxy=maxy))
+                    # Extract the data from the database using the current query and store it in a GeoDataFrame
+                    dict_df[layer] = geopandas.GeoDataFrame.from_postgis(query, condb, crs=crs, geom_col='geom')
+                # Merge all features in the GeoDataFrame
+                dict_df[layer] = dict_df[layer].dissolve()
+                # Rename the geometry column to "geometry"
+                dict_df[layer] = dict_df[layer].rename_geometry("geometry")
+        # close connection
+        engine.dispose()
+        
+        # create raser from the layers
+        create_raster(geodataframe = tile, layers_dict = dict_df, 
+                    raster_path = raster_path, 
+                    resolution = resolution, default_value=2)
 
 def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154'):
     cell_size = int(resolution)
