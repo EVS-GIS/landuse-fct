@@ -182,8 +182,14 @@ def landuse_tile(
         )
 
         with engine.connect() as conn:
-            conn.execute('DISCARD PLANS;')
-            conn.execute('DISCARD SEQUENCES;')
+            # Obtenez la connexion sous-jacente de SQLAlchemy
+            conn = conn.connection
+
+            # Exécutez la commande DISCARD avec psycopg2
+            with conn.cursor() as cursor:
+                cursor.execute("DISCARD PLANS")
+                cursor.execute("DISCARD SEQUENCES")
+                conn.commit()
         
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
