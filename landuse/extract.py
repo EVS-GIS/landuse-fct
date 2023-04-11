@@ -172,7 +172,7 @@ def landuse_tile(
                     raster_path = raster_path, 
                     resolution = resolution, default_value=2)
 
-def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154'):
+def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154', tileset = './outputs/tileset.gpkg'):
     cell_size = int(resolution)
     # Obtenez l'emprise du GeoDataFrame
     bounds = geodataframe.total_bounds
@@ -205,7 +205,12 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
         **profile
     ) as dst:
         # Créez un tableau avec la valeur par défaut
-        data = default_value * numpy.ones((rows, cols), dtype=rasterio.uint8)
+        data_default = default_value * numpy.ones((rows, cols), dtype=rasterio.uint8)
+
+        gdf_tileset = geopandas.read_file(tileset)
+        nodata_value = 255
+
+        data = numpy.where(rasterio.features.geometry_mask(gdf_tileset.geometry, out_shape=data_default.shape, transform=transform, invert=True), nodata_value, data_default)
 
         for gdf in layers_dict.values():
             if gdf.geometry.isnull().all()==False:
