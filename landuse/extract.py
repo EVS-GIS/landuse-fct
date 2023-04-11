@@ -172,9 +172,18 @@ def landuse_tile(
             # close connection
             condb.close()
 
-        with engine.connect() as condb:
-            condb.execute('DISCARD PLANS;')
-            condb.execute('DISCARD SEQUENCES;')
+        import psycopg2
+        conn = psycopg2.connect(
+            host=db_params['host'],
+            port=db_params['port'],
+            user=db_params['user'],
+            password=db_params['password'],
+            dbname=db_params['database']
+        )
+
+        with engine.connect() as conn:
+            conn.execute('DISCARD PLANS;')
+            conn.execute('DISCARD SEQUENCES;')
         
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
