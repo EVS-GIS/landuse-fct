@@ -20,69 +20,82 @@ import geopandas
 from shapely.geometry import Polygon
 
 def CreateTileset(tile_size: float = 1000.0,
-                  zone_etude_path: str = './inputs/zone_etude.gpkg',
+                  study_area_path: str = './inputs/zone_etude.gpkg',
                   tileset_path: str = './outputs/tileset.gpkg',
                   crs = '2154'):
     """
-    Creates one tilesets in GeoPackage format (.gpkg) with rectangular polygons that tile the bounding box of 
-    the given datasource according to a resolution parameter. The first tileset contains polygons that are 
-    aligned with the bounding box, whereas the second tileset contains polygons that are shifted by half the 
-    resolution in both the x and y directions.
+    Creates a GeoPackage tileset containing rectangular polygons that tile the bounding box of the given
+    study area according to a resolution parameter.
 
-    :param resolution: float, default=1000.0
+    :param tile_size: float, default=1000.0
         The width and height of the rectangular polygons in the tilesets.
+    :param study_area_path: str, default='./inputs/zone_etude.gpkg'
+        The path to the study area file in GeoPackage format.
+    :param tileset_path: str, default='./outputs/tileset.gpkg'
+        The path to the tileset file in GeoPackage format.
+    :param crs: str or int, default='2154'
+        The CRS code or name for the tileset.
     :return: None
     """
 
-    schema = { 
+    # Define the schema for the output GeoPackage.
+    schema = {
         'geometry': 'Polygon', 
-        'properties': {'GID': 'int',
-                       'ROW': 'int',
-                       'COL': 'int',
-                       'X0': 'float',
-                       'Y0': 'float'} }
-    
+        'properties': {
+            'GID': 'int',
+            'ROW': 'int',
+            'COL': 'int',
+            'X0': 'float',
+            'Y0': 'float'
+        }
+    }
+
+    # Define options for the output GeoPackage.
     options = dict(
         driver='GPKG',
         schema=schema,
-        crs=fiona.crs.from_epsg(crs))
-    
-    # extract bounding box coordinates from zone_etude input
-    zone_etude = geopandas.read_file(zone_etude_path)
-    minx, miny, maxx, maxy = [float(val) for val in zone_etude.total_bounds]
+        crs=fiona.crs.from_epsg(crs)
+    )
 
-    # add resolution to max to get the whole extent and above
+    # Read the study area file to extract the bounding box coordinates.
+    study_area = geopandas.read_file(study_area_path)
+    minx, miny, maxx, maxy = [float(val) for val in study_area.total_bounds]
+
+    # Add the tile size to the maximum coordinates to get the whole extent and above.
     maxx += tile_size
     maxy += tile_size
 
-    # Tileset
+    # Create a mesh grid of the bounding box coordinates with a spacing of `tile_size`.
     gx, gy = np.arange(minx, maxx, tile_size), np.arange(miny, maxy, tile_size)
-    tileset = tileset_path
 
+    # Create the tileset file and write each tile feature.
     gid = 1
-    with fiona.open(tileset, 'w', **options) as dst:   
+    with fiona.open(tileset_path, 'w', **options) as dst:
         for i in range(len(gx)-1):
             for j in range(len(gy)-1):
-                
+                # Define the coordinates of the tile polygon.
                 coordinates = [(gx[i],gy[j]),(gx[i],gy[j+1]),(gx[i+1],gy[j+1]),(gx[i+1],gy[j])]
-                
-                feature = {'geometry': {
-                            'type':'Polygon',
-                            'coordinates': [coordinates] 
-                            },
-                           'properties': {
-                               'GID': gid,
-                               'ROW': len(gy)-j-1,
-                               'COL': i+1,
-                               'Y0': gy[j+1],
-                               'X0': gx[i]
-                           }
+
+                # Define the feature properties and geometry.
+                feature = {
+                    'geometry': {
+                        'type':'Polygon',
+                        'coordinates': [coordinates] 
+                    },
+                    'properties': {
+                        'GID': gid,
+                        'ROW': len(gy)-j-1,
+                        'COL': i+1,
+                        'Y0': gy[j+1],
+                        'X0': gx[i]
                     }
-                
-                # write only features if intersect with zone_etude
-                if zone_etude.intersects(Polygon(coordinates)).any()==True:
+                }
+
+                # Write only features that intersect with the study area.
+                if study_area.intersects(Polygon(coordinates)).any() == True:
                     dst.write(feature)
-                    gid+=1
+                    gid += 1
+
 
 def starcall_nokwargs(args):
     """

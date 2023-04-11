@@ -25,10 +25,10 @@ from rasterio import Affine
 import numpy
 from rasterio import features
 import click
-import psycopg2
 
 
 # PAS COMPATIBLE AVEC WINDOWS!
+# multiprocess with tiles selection
 def multiprocess_landuse_gid(
         tileset: str = 'tileset.gpkg',  # tileset path,
         gid_start: int = 1,
@@ -77,16 +77,47 @@ def multiprocess_landuse_gid(
 
 # PAS COMPATIBLE AVEC WINDOWS!
 def multiprocess_landuse(
-        tileset: str = 'tileset.gpkg',  # tileset path,
-        processes: int = 1, # number of processes
-        tile_dir: str = './outputs/landuse/',
-        resolution: int = 5,
-        db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
+        tileset: str = 'tileset.gpkg',  # Path to the tileset
+        processes: int = 1, # Number of processes
+        tile_dir: str = './outputs/landuse/', # Directory where the output files will be written
+        resolution: int = 5, # Resolution of the landuse rasters
+        db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'}, # Database connection parameters
         queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
         landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
-        crs: str = '2154',
-        zone_etude_path:str = './inputs/zone_etude.gpkg'
-        ):
+        crs: str = '2154', # EPSG code of the tileset
+        study_area_path:str = './inputs/zone_etude.gpkg' # Path to the study area shapefile
+        ) -> None:
+    """
+    This function extracts the landuse data from a tileset using SQL queries and
+    writes the result to a raster file. It uses multiple processes to speed up the
+    computation.
+
+    Parameters:
+    -----------
+    tileset: str
+        Path to the tileset GeoPackage file.
+    processes: int
+        Number of processes to use for parallel execution.
+    tile_dir: str
+        Path to the directory where the output tiles will be saved.
+    resolution: int
+        The resolution of the landuse classification in meters.
+    db_params: dict
+        A dictionary containing the parameters for the database connection.
+        The following keys are required: host, port, database, user, password.
+    queries_dir_path: str
+        The path to the directory containing the SQL query files.
+    landcover_tables: list
+        A list of landcover tables to extract data from.
+    crs: str
+        The EPSG code of the tileset.
+    study_area_path: str
+        Path to the shapefile of the study area.
+
+    Returns:
+    --------
+    None
+    """
     
     # pg database connexion
 
@@ -103,7 +134,7 @@ def multiprocess_landuse(
                 queries_dir_path,
                 landcover_tables,
                 crs,
-                zone_etude_path
+                study_area_path
             )
 
     arguments = list(arguments())
@@ -125,7 +156,7 @@ def landuse_tile(
     queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
     landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
     crs: str = '2154',
-    zone_etude_path:str = './inputs/zone_etude.gpkg'
+    study_area_path:str = './inputs/zone_etude.gpkg'
 ):
     """
     Extract PostGIS data from a tile.
@@ -187,21 +218,44 @@ def landuse_tile(
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
                     raster_path = raster_path, 
-                    resolution = resolution, default_value=2, crs = '2154', zone_etude_path = zone_etude_path)
+                    resolution = resolution, default_value=2, crs = '2154', study_area_path = study_area_path)
 
-def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154', zone_etude_path = './inputs/zone_etude.gpkg'):
+def create_raster(
+        geodataframe:geopandas.GeoDataFrame, # tile geodataframe 
+        layers_dict:dict, 
+        raster_path:str = './outputs/landuse/', 
+        resolution:int = 5, 
+        default_value:int =2, 
+        crs:str = '2154', 
+        study_area_path:str = './inputs/zone_etude.gpkg'):
+    """
+    Creates a new raster file from a GeoDataFrame and a dictionary of layers.
+
+    Parameters:
+    geodataframe (GeoDataFrame): The GeoDataFrame containing the geometry for the new raster.
+    layers_dict (dictionary): A dictionary of layers containing the geometry and value to rasterize.
+    raster_path (string): The path to save the new raster.
+    resolution (int): The resolution of the new raster. Default is 5.
+    default_value (int): The default value to use when creating the raster. Default is 2.
+    crs (string): The coordinate reference system of the new raster. Default is '2154'.
+    study_area_path (string): The path to the study area GeoPackage file. Default is './inputs/zone_etude.gpkg'.
+    """
+
+    # Calculate cell size from resolution parameter
     cell_size = int(resolution)
-    # Obtenez l'emprise du GeoDataFrame
+
+    # Get the bounds of the GeoDataFrame
     bounds = geodataframe.total_bounds
     xmin, ymin, xmax, ymax = bounds
 
-    # Calculez le nombre de cellules en x et y
+    # Calculate the number of cells in x and y directions
     cols = int((xmax - xmin) / cell_size)
     rows = int((ymax - ymin) / cell_size)
 
-    # Créez la transformation affine
+    # Create the affine transformation for the raster
     transform = Affine.translation(xmin, ymax) * Affine.scale(resolution, -resolution)
 
+    # Create the profile for the new raster
     profile = {
         'driver': 'GTiff',
         'dtype': rasterio.uint8,
@@ -215,26 +269,30 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
         'dtype': rasterio.uint8
     }
 
-    # Créez un nouveau raster vide
-    with rasterio.open(
-        raster_path,
-        'w',
-        **profile
-    ) as dst:
-        # Créez un tableau avec la valeur par défaut
+    # Create a new empty raster file
+    with rasterio.open(raster_path, 'w', **profile) as dst:
+        # Create a data array with the default value
         data = default_value * numpy.ones((rows, cols), dtype=rasterio.uint8)
 
-        gdf_zone_etude = geopandas.read_file(zone_etude_path)
+        # Read the study area GeoPackage file
+        gdf_study_area = geopandas.read_file(study_area_path)
+
+        # Set the nodata value for the new raster
         nodata_value = 255
 
+        # Rasterize each layer in the layers dictionary
         for gdf in layers_dict.values():
-            if gdf.geometry.isnull().all()==False:
+            # Check if the geometry column is not null
+            if gdf.geometry.isnull().all() == False:
+                # Create shapes and rasterize
                 shapes = ((geom,value) for geom, value in zip(gdf.geometry, gdf.value))
                 raster = features.rasterize(shapes = shapes, out_shape = (rows, cols), fill=-1, transform=transform)
+                # Create a mask to update the data array
                 mask = raster > -1
                 data[mask] = raster[mask]
-        
-        data = numpy.where(rasterio.features.geometry_mask(gdf_zone_etude.geometry, out_shape=data.shape, transform=transform, invert=False), nodata_value, data)
-        
-        # Écrire le tableau sur le raster
+
+        # Mask the data array with the study area geometry
+        data = numpy.where(rasterio.features.geometry_mask(gdf_study_area.geometry, out_shape=data.shape, transform=transform, invert=False), nodata_value, data)
+
+        # Write the data array to the raster file
         dst.write(data, 1)

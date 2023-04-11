@@ -14,7 +14,7 @@ processes = params['processes']
 # create tileset from input spatial extent
 CreateTileset(
     tile_size = params['tile_size'],
-    zone_etude_path = os.path.join(paths['inputs_dir'], paths['zone_etude_name']),
+    study_area_path = os.path.join(paths['inputs_dir'], paths['study_area_name']),
     tileset_path = os.path.join(paths['outputs_dir'], paths['tileset_name']),
     crs = params['crs'])
 
