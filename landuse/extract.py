@@ -169,8 +169,11 @@ def landuse_tile(
                 dict_df[layer] = dict_df[layer].dissolve()
                 # Rename the geometry column to "geometry"
                 dict_df[layer] = dict_df[layer].rename_geometry("geometry")
-        # close connection
-        engine.dispose()
+            # close connection
+            condb.close()
+
+            condb.execute('DISCARD PLANS')
+            condb.execute('DISCARD SEQUENCES')
         
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
