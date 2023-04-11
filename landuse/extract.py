@@ -26,6 +26,52 @@ import numpy
 from rasterio import features
 import click
 
+
+# PAS COMPATIBLE AVEC WINDOWS!
+def multiprocess_landuse_gid(
+        tileset: str = 'tileset.gpkg',  # tileset path,
+        gid_start: int = 1,
+        gid_end:int = 1000,
+        processes: int = 1, # number of processes
+        tile_dir: str = './outputs/landuse/',
+        resolution: int = 5,
+        db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
+        queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
+        landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
+        crs: str = '2154'
+        ):
+    
+    # pg database connexion
+
+    def arguments():
+
+        gdf = geopandas.read_file(tileset)
+        mask = (gdf['GID'] >= 1) & (gdf['GID'] <= 1000)
+        tileset = gdf.loc[mask]
+        
+        for gid in tileset['GID']:
+            yield (
+                landuse_tile,
+                gid,
+                tileset,
+                resolution,
+                tile_dir,
+                db_params,
+                queries_dir_path,
+                landcover_tables,
+                crs
+            )
+
+    arguments = list(arguments())
+
+    with Pool(processes=processes) as pool:
+
+        pooled = pool.imap_unordered(starcall_nokwargs, arguments)
+    
+        with click.progressbar(pooled, length=len(arguments)) as iterator:
+                for _ in iterator:
+                    pass
+
 # PAS COMPATIBLE AVEC WINDOWS!
 def multiprocess_landuse(
         tileset: str = 'tileset.gpkg',  # tileset path,
