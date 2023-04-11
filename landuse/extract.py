@@ -45,11 +45,11 @@ def multiprocess_landuse_gid(
 
     def arguments():
 
-        gdf = geopandas.read_file(tileset)
-        mask = (gdf['GID'] >= gid_start) & (gdf['GID'] <= gid_end)
-        tileset = gdf.loc[mask]
+        # gdf = geopandas.read_file(tileset)
+        # mask = (gdf['GID'] >= gid_start) & (gdf['GID'] <= gid_end)
+        # tileset = gdf.loc[mask]
         
-        for gid in tileset['GID']:
+        for gid in geopandas.read_file(tileset).loc[(geopandas.read_file(tileset)['GID'] >=gid_start) & (geopandas.read_file(tileset)['GID'] <= gid_end), 'GID']:
             yield (
                 landuse_tile,
                 gid,
