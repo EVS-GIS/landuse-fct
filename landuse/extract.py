@@ -173,15 +173,7 @@ def landuse_tile(
             # close connection
             condb.close()
 
-        
-        # conn = psycopg2.connect(
-        #     host=db_params['host'],
-        #     port=db_params['port'],
-        #     user=db_params['user'],
-        #     password=db_params['password'],
-        #     dbname=db_params['database']
-        # )
-
+        # clean postgresql cache memory for the actual session
         with engine.connect() as condb:
             # SQLAlchemy DBAPI Connection able to run DISCARD commands
             condb = condb.connection
