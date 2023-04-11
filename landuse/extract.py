@@ -38,7 +38,8 @@ def multiprocess_landuse_gid(
         db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
         queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
         landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
-        crs: str = '2154'
+        crs: str = '2154',
+        zone_etude_path:str = './inputs/zone_etude.gpkg'
         ):
     
     # pg database connexion
@@ -59,7 +60,8 @@ def multiprocess_landuse_gid(
                 db_params,
                 queries_dir_path,
                 landcover_tables,
-                crs
+                crs,
+                zone_etude_path
             )
 
     arguments = list(arguments())
@@ -81,7 +83,8 @@ def multiprocess_landuse(
         db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
         queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
         landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
-        crs: str = '2154'
+        crs: str = '2154',
+        zone_etude_path:str = './inputs/zone_etude.gpkg'
         ):
     
     # pg database connexion
@@ -98,7 +101,8 @@ def multiprocess_landuse(
                 db_params,
                 queries_dir_path,
                 landcover_tables,
-                crs
+                crs,
+                zone_etude_path
             )
 
     arguments = list(arguments())
@@ -119,7 +123,8 @@ def landuse_tile(
     db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
     queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
     landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
-    crs: str = '2154'
+    crs: str = '2154',
+    zone_etude_path:str = './inputs/zone_etude.gpkg'
 ):
     """
     Extract PostGIS data from a tile.
@@ -170,9 +175,9 @@ def landuse_tile(
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
                     raster_path = raster_path, 
-                    resolution = resolution, default_value=2, crs = '2154', tileset = tileset)
+                    resolution = resolution, default_value=2, crs = '2154', zone_etude_path = zone_etude_path)
 
-def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154', tileset = './outputs/tileset.gpkg'):
+def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154', zone_etude_path = './inputs/zone_etude.gpkg'):
     cell_size = int(resolution)
     # Obtenez l'emprise du GeoDataFrame
     bounds = geodataframe.total_bounds
@@ -207,7 +212,7 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
         # Créez un tableau avec la valeur par défaut
         data = default_value * numpy.ones((rows, cols), dtype=rasterio.uint8)
 
-        gdf_tileset = geopandas.read_file(tileset)
+        gdf_zone_etude = geopandas.read_file(zone_etude_path)
         nodata_value = 255
 
         for gdf in layers_dict.values():
@@ -217,7 +222,7 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
                 mask = raster > -1
                 data[mask] = raster[mask]
         
-        data = numpy.where(rasterio.features.geometry_mask(gdf_tileset.geometry, out_shape=data.shape, transform=transform, invert=False), nodata_value, data)
+        data = numpy.where(rasterio.features.geometry_mask(gdf_zone_etude.geometry, out_shape=data.shape, transform=transform, invert=True), nodata_value, data)
         
         # Écrire le tableau sur le raster
         dst.write(data, 1)
