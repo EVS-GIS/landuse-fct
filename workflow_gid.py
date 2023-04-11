@@ -12,16 +12,16 @@ db_params = db_config()
 processes = params['processes']
 
 # create tileset from input spatial extent
-CreateTileset(
-    tile_size = params['tile_size'],
-    zone_etude_path = os.path.join(paths['inputs_dir'], paths['zone_etude_name']),
-    tileset_path = os.path.join(paths['outputs_dir'], paths['tileset_name']),
-    crs = params['crs'])
+# CreateTileset(
+#     tile_size = params['tile_size'],
+#     zone_etude_path = os.path.join(paths['inputs_dir'], paths['zone_etude_name']),
+#     tileset_path = os.path.join(paths['outputs_dir'], paths['tileset_name']),
+#     crs = params['crs'])
 
 # create landuse raster
 multiprocess_landuse_gid(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
              gid_start = 1,
-             gid_end = 500,
+             gid_end = 5,
              processes = processes,
              tile_dir = paths['tiles_dir'],
              resolution = params['resolution'],
@@ -29,6 +29,6 @@ multiprocess_landuse_gid(tileset = os.path.join(paths['outputs_dir'], paths['til
              queries_dir_path = paths['query_dir_path'],
              landcover_tables = params['landcover_tables'],
              crs = params['crs'],
-            zone_etude_path = os.path.join(paths['inputs_dir'], paths['zone_etude_name']))
+             zone_etude_path = os.path.join(paths['inputs_dir'], paths['zone_etude_name']))
 
 # create_vrt_raster(paths['tiles_dir'],  os.path.join(paths['outputs_dir'], paths['vrt_name']))
