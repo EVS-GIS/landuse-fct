@@ -210,8 +210,6 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
         gdf_tileset = geopandas.read_file(tileset)
         nodata_value = 255
 
-        # data = numpy.where(rasterio.features.geometry_mask(gdf_tileset.geometry, out_shape=data_default.shape, transform=transform, invert=True), nodata_value, data_default)
-
         for gdf in layers_dict.values():
             if gdf.geometry.isnull().all()==False:
                 shapes = ((geom,value) for geom, value in zip(gdf.geometry, gdf.value))
@@ -219,7 +217,7 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
                 mask = raster > -1
                 data[mask] = raster[mask]
         
-        # data = numpy.where(rasterio.features.geometry_mask(gdf_tileset.geometry, out_shape=data.shape, transform=transform, invert=True), nodata_value, data)
+        data = numpy.where(rasterio.features.geometry_mask(gdf_tileset.geometry, out_shape=data.shape, transform=transform, invert=True), nodata_value, data)
         
         # Écrire le tableau sur le raster
         dst.write(data, 1)
