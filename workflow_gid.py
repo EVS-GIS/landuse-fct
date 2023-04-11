@@ -1,7 +1,7 @@
 import os
 from config.config import db_config, paths_config, parameters_config
 from tiles.tiles import CreateTileset
-from landuse.extract import multiprocess_landuse, landuse_tile
+from landuse.extract import multiprocess_landuse_gid
 
 # parameters
 paths = paths_config()
@@ -18,19 +18,8 @@ CreateTileset(
     tileset_path = os.path.join(paths['outputs_dir'], paths['tileset_name']),
     crs = params['crs'])
 
-# landuse_tile(
-#     gid = 3, # tile index
-#     tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']),  # tileset path
-#     resolution = params['resolution'], # outupt raster resolution
-#     tile_dir = paths['tiles_dir'],
-#     db_params = db_params,
-#     queries_dir_path = paths['query_dir_path'],
-#     landcover_tables = params['landcover_tables'],
-#     crs = params['crs'])
-
-
 # create landuse raster
-multiprocess_landuse(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
+multiprocess_landuse_gid(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
              gid_start = 1,
              gid_end = 500,
              processes = processes,
