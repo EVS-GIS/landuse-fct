@@ -222,7 +222,7 @@ def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, defaul
                 mask = raster > -1
                 data[mask] = raster[mask]
         
-        data = numpy.where(rasterio.features.geometry_mask(gdf_zone_etude.geometry, out_shape=data.shape, transform=transform, invert=True), nodata_value, data)
+        data = numpy.where(rasterio.features.geometry_mask(gdf_zone_etude.geometry, out_shape=data.shape, transform=transform, invert=False), nodata_value, data)
         
         # Écrire le tableau sur le raster
         dst.write(data, 1)
