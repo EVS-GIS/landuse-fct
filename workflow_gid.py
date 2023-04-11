@@ -28,6 +28,7 @@ multiprocess_landuse_gid(tileset = os.path.join(paths['outputs_dir'], paths['til
              db_params = db_params,
              queries_dir_path = paths['query_dir_path'],
              landcover_tables = params['landcover_tables'],
-             crs = params['crs'])
+             crs = params['crs'],
+            zone_etude_path = os.path.join(paths['inputs_dir'], paths['zone_etude_name']))
 
 # create_vrt_raster(paths['tiles_dir'],  os.path.join(paths['outputs_dir'], paths['vrt_name']))
