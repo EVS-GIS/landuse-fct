@@ -172,8 +172,8 @@ def landuse_tile(
             # close connection
             condb.close()
 
-            condb.execute('DISCARD PLANS')
-            condb.execute('DISCARD SEQUENCES')
+            condb.execute('DISCARD PLANS;')
+            condb.execute('DISCARD SEQUENCES;')
         
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
