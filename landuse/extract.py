@@ -25,6 +25,7 @@ from rasterio import Affine
 import numpy
 from rasterio import features
 import click
+import psycopg2
 
 
 # PAS COMPATIBLE AVEC WINDOWS!
@@ -172,24 +173,24 @@ def landuse_tile(
             # close connection
             condb.close()
 
-        import psycopg2
-        conn = psycopg2.connect(
-            host=db_params['host'],
-            port=db_params['port'],
-            user=db_params['user'],
-            password=db_params['password'],
-            dbname=db_params['database']
-        )
+        
+        # conn = psycopg2.connect(
+        #     host=db_params['host'],
+        #     port=db_params['port'],
+        #     user=db_params['user'],
+        #     password=db_params['password'],
+        #     dbname=db_params['database']
+        # )
 
-        with engine.connect() as conn:
-            # Obtenez la connexion sous-jacente de SQLAlchemy
-            conn = conn.connection
+        with engine.connect() as condb:
+            # SQLAlchemy DBAPI Connection able to run DISCARD commands
+            condb = condb.connection
 
-            # Exécutez la commande DISCARD avec psycopg2
-            with conn.cursor() as cursor:
-                cursor.execute("DISCARD PLANS")
-                cursor.execute("DISCARD SEQUENCES")
-                conn.commit()
+            # Execute DISCARD PLANS and SEQUENCES with psycopg2
+            with condb.cursor() as cursor:
+                cursor.execute("DISCARD PLANS;")
+                cursor.execute("DISCARD SEQUENCES;")
+                condb.commit()
         
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
