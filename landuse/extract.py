@@ -170,7 +170,7 @@ def landuse_tile(
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
                     raster_path = raster_path, 
-                    resolution = resolution, default_value=2)
+                    resolution = resolution, default_value=2, crs = '2154', tileset = tileset)
 
 def create_raster(geodataframe, layers_dict, raster_path, resolution = 5, default_value=2, crs = '2154', tileset = './outputs/tileset.gpkg'):
     cell_size = int(resolution)
