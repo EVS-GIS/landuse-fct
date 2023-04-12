@@ -38,7 +38,7 @@ WITH
 	),
 	-- closing process
 	dilatation AS (
-		SELECT st_buffer(bati.geom, 20, 'join=bevel') AS geom
+		SELECT st_buffer(ST_union(bati.geom), 20, 'join=bevel') AS geom
 		FROM bati
 	),
 	erosion AS (
