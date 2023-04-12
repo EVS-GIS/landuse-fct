@@ -42,7 +42,7 @@ WITH
 		FROM bati
 	),
 	erosion AS (
-		SELECT st_buffer(st_union(dilatation.geom), -20, 'join=bevel') AS geom
+		SELECT st_buffer(dilatation.geom, -20, 'join=bevel') AS geom
 		FROM dilatation
 	),
 	buff AS (
