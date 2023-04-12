@@ -40,7 +40,7 @@ def multiprocess_landuse_gid(
         queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
         landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
         crs: str = '2154',
-        zone_etude_path:str = './inputs/zone_etude.gpkg'
+        study_area_path:str = './inputs/zone_etude.gpkg'
         ):
     
     # pg database connexion
@@ -62,7 +62,7 @@ def multiprocess_landuse_gid(
                 queries_dir_path,
                 landcover_tables,
                 crs,
-                zone_etude_path
+                study_area_path
             )
 
     arguments = list(arguments())
