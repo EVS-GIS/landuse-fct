@@ -38,15 +38,15 @@ WITH
 	),
 	-- closing process
 	dilatation AS (
-		SELECT st_buffer(ST_SnapToGrid(ST_union(bati.geom), 0.001), 20, 'join=bevel') AS geom
+		SELECT ST_SnapToGrid(st_buffer(ST_union(bati.geom), 20, 'join=bevel'), 0.001) AS geom
 		FROM bati
 	),
 	erosion AS (
-		SELECT st_buffer(ST_SnapToGrid(ST_union(dilatation.geom), 0.001), -20, 'join=bevel') AS geom
+		SELECT st_buffer(dilatation.geom, -20, 'join=bevel') AS geom
 		FROM dilatation
 	),
 	buff AS (
-		SELECT ST_buffer(ST_SnapToGrid(ST_union(erosion.geom), 0.001), 5, 'join=bevel') AS geom
+		SELECT ST_buffer(erosion.geom, 5, 'join=bevel') AS geom
 		FROM erosion
 	),
 	clip_bati AS (
