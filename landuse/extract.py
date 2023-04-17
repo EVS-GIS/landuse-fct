@@ -181,9 +181,9 @@ def landuse_tile(
     else:
         
         # Construct a connection string to the PostgreSQL database using the provided database parameters
-        con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}, pool_pre_ping=True"
+        con = f"postgresql://{db_params['user']}:{db_params['password']}@{db_params['host']}:{db_params['port']}/{db_params['database']}"
         # Create a SQLAlchemy engine to connect to the database
-        engine = create_engine(con)
+        engine = create_engine(con, pool_pre_ping=True)
 
         # Create an empty dictionary to store the extracted data
         dict_df = {}
