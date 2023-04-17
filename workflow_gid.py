@@ -20,8 +20,8 @@ processes = params['processes']
 
 # create landuse raster
 multiprocess_landuse_gid(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
-             gid_start = 3021,
-             gid_end = 3030,
+             gid_start = 3031,
+             gid_end = 3100,
              processes = processes,
              tile_dir = paths['tiles_dir'],
              resolution = params['resolution'],
