@@ -45,7 +45,13 @@ python3.11 -m venv env --prompt landuse-fct
 .\env\Scripts\activate
 # update pip
 python -m pip install -U pip
-# install dependencies
+# install GDAL
+# Linux
+pip install GDAL
+# Windows
+# download GDAL-3.4.3-cp311-cp311-win_amd64.whl in Christoph Gohlke’s website : https://www.lfd.uci.edu/~gohlke/pythonlibs/#gdal
+python -m pip install path/to/gdalwheel/GDAL-3.4.3-cp311-cp311-win_amd64.whl
+# install all others dependencies
 pip install -r requirements.txt
 ```
 

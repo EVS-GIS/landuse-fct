@@ -1,5 +1,7 @@
-/output/
+create_vrt.py
+/outputs/
 __pycache__/
 config.ini
+/test/
 
 env
