@@ -203,17 +203,6 @@ def landuse_tile(
                 dict_df[layer] = dict_df[layer].rename_geometry("geometry")
             # close connection
             condb.close()
-
-        # clean postgresql cache memory for the actual session
-        with engine.connect() as condb:
-            # SQLAlchemy DBAPI Connection able to run DISCARD commands
-            condb = condb.connection
-
-            # Execute DISCARD PLANS and SEQUENCES with psycopg2
-            with condb.cursor() as cursor:
-                cursor.execute("DISCARD PLANS;")
-                cursor.execute("DISCARD SEQUENCES;")
-                condb.commit()
         
         # create raser from the layers
         create_raster(geodataframe = tile, layers_dict = dict_df, 
