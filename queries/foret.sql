@@ -11,7 +11,7 @@ WITH
 													'Forêt fermée de conifères')
 	),
 	dilatation AS (
-            SELECT st_buffer(geom, 20, 'join=bevel') AS geom
+            SELECT ST_SnapToGrid(st_buffer(geom, 20, 'join=bevel'), 0.001) AS geom
             FROM foret
         ),
 	erosion AS (
