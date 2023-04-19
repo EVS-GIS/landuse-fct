@@ -8,9 +8,6 @@ paths = paths_config()
 params = parameters_config()
 db_params = db_config()
 
-# processes cores
-processes = params['processes']
-
 # create tileset from input spatial extent
 # CreateTileset(
 #     tile_size = params['tile_size'],
@@ -22,7 +19,7 @@ processes = params['processes']
 multiprocess_landuse_gid(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
              gid_start = 5001,
              gid_end = 5866,
-             processes = processes,
+             processes = params['processes'],
              tile_dir = paths['tiles_dir'],
              resolution = params['resolution'],
              db_params = db_params,
