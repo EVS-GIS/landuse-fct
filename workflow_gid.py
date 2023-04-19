@@ -17,7 +17,7 @@ db_params = db_config()
 
 # create landuse raster
 multiprocess_landuse_gid(tileset = os.path.join(paths['outputs_dir'], paths['tileset_name']), 
-             gid_start = 5001,
+             gid_start = 1,
              gid_end = 5866,
              processes = params['processes'],
              tile_dir = paths['tiles_dir'],
