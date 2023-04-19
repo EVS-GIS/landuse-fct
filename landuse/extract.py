@@ -172,7 +172,7 @@ def landuse_tile(
     dataset = geopandas.read_file(tileset)
     tile = dataset[dataset['GID']==gid]
     id = f"{gid:05d}"
-    raster_path = raster_path = os.path.join(tile_dir, 'LANDUSE_'+id+'.tif')
+    raster_path = os.path.join(tile_dir, 'LANDUSE_'+id+'.tif')
 
     if os.path.exists(raster_path):
 

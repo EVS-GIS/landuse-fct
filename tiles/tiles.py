@@ -13,6 +13,7 @@ DOCME
 ***************************************************************************
 """
 
+import os
 import numpy as np
 import fiona
 import fiona.crs
@@ -104,3 +105,26 @@ def starcall_nokwargs(args):
 
     fun = args[0]
     return fun(*args[1:])
+
+def check_tiles_outputs(
+        tileset_path: str,
+        tiles_dir_path: str):
+    """
+    Check if all files in outputs folder has been created
+    """
+    # read tileset
+    tileset = geopandas.read_file(tileset_path)
+    missing_tile = []
+    
+    # generate the tile name from gid in tileset then check fi the file exist in tiles output folder
+    for gid in tileset['GID']:
+        id = f"{gid:05d}"
+        tile_name = 'LANDUSE_'+str(id)+'.tif'
+        file_path = os.path.join(tiles_dir_path, tile_name)
+        if os.path.isfile(file_path)==False:
+            missing_tile.append(tile_name)
+    # return the missing tiles in tilset if missing_file not empty
+    if missing_tile:
+        return False, print(missing_tile)
+    else:
+        return True, "All tiles created for tileset"
