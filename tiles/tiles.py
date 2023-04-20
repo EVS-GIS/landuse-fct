@@ -127,4 +127,4 @@ def check_tiles_outputs(
     if missing_tile:
         return False, print(missing_tile)
     else:
-        return True, "All tiles created for tileset"
+        return True, print('All tiles created for tileset')
