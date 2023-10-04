@@ -116,8 +116,8 @@ The database with datasets imported need to be prepare to set SRID, geometry col
 # Run database_preparation.py
 python database_preparation.py
 
-# run landuse.py to create landuse raster and vector files
-python landuse.py
+# run workflow.py to create landuse raster and vector files for the whole territory or workflow_gid.py to run by set of tiles (useful to run big territory).
+python workflow.py or python workflow_gid.py
 ```
 
 The *output* directory gather the final files.
