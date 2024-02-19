@@ -5,6 +5,10 @@ authors:
     given-names: Louis
     orcid: https://orcid.org/0000-0003-0426-2975
     affiliation: "CNRS - Environnement Ville Société (UMR 5600)"
+  - family-names: Rousson
+    given-names: Christophe
+    orcid: https://orcid.org/0000-0003-4427-5826
+    affiliation: "CNRS - Environnement Ville Société (UMR 5600), Geopeka"
 title: "landuse-fct"
 version: 1.0.0
 repository-code: "https://github.com/EVS-GIS/landuse-fct"
