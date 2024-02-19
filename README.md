@@ -171,7 +171,7 @@ La classe PERIURBAIN est peu clair dans la documentation. La zone d'habitation d
 
 ## How to cite
 
-Manière, L. (2024). landuse-fct (Version 1.0.0) [Computer software]. https://github.com/EVS-GIS/landuse-fct
+Manière, L., & Rousson, C. (2024). landuse-fct (Version 1.0.0) [Computer software]. https://github.com/EVS-GIS/landuse-fct
 
 ## Licence
 
