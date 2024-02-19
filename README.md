@@ -108,7 +108,11 @@ ogr2ogr -f PostgreSQL PG:"dbname='my_database'" path/to/my/data/directory/landus
 
 To create the landuse map, a database.ini file need to be configurate with the Postgresql database parameters created. Rename config/example_config.ini file to config.ini then modify the parameters with the right configuration.
 
+The processing need the spatial extent to get the the landuse inside with geopackage file inside the inputs directory (some exemple for france available), study_area_name in config.ini set the file to choose.
+
 The database with datasets imported need to be prepare to set SRID, geometry columns, primary keys and spatial index before generate landuse map. In command prompt in landuse directory and with activated virtual environment.
+
+The *output* directory gather the final files.
 
 **WARNING, the operation could be time consuming if you have loaded the whole France**
 
@@ -117,10 +121,14 @@ The database with datasets imported need to be prepare to set SRID, geometry col
 python database_preparation.py
 
 # run workflow.py to create landuse raster and vector files for the whole territory or workflow_gid.py to run by set of tiles (useful to run big territory).
-python workflow.py or python workflow_gid.py
-```
+python workflow.py
 
-The *output* directory gather the final files.
+# run check_outputs.py to check if all files in outputs folder has been created.
+python check_outputs.py
+
+# run create_vrt.py to create a virtual raster from the output tiles.
+python create_vrt.py
+```
 
 ## Démarche de la reproduction
 
@@ -160,3 +168,11 @@ Pour résumer, pour retrouver les éléments de la classe BATI de Christophe Rou
 On ne trouve cependant pas de précisions sur le traitement de la couche construction_lineaire dans la classe BATI de la nomenclature de Christophe Rousson. Il faut transfomer ces lignes en polygone pour pouvoir les associer aux autres éléments de la classe. Un buffer de 2m a été appliqué, le même que les opérations morphologiques même si ces opérations sont effectuées après compilation des polygones.
 
 La classe PERIURBAIN est peu clair dans la documentation. La zone d'habitation de la BD TOPO a été utilisé avec une érosion de 20m car cette couche est un peu plus large que le bâti.
+
+## How to cite
+
+Manière, L. (2024). landuse-fct (Version 1.0.0) [Computer software]. https://github.com/EVS-GIS/landuse-fct
+
+## Licence
+
+This program is released under the [GNU Public License v3](https://github.com/EVS-GIS/landuse-fct/blob/main/LICENSE).

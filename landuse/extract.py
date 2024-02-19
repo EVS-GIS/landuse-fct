@@ -1,18 +1,5 @@
 # coding: utf-8
 
-"""
-DOCME
-
-***************************************************************************
-*                                                                         *
-*   This program is free software; you can redistribute it and/or modify  *
-*   it under the terms of the GNU General Public License as published by  *
-*   the Free Software Foundation; either version 2 of the License, or     *
-*   (at your option) any later version.                                   *
-*                                                                         *
-***************************************************************************
-"""
-
 import os
 from multiprocessing import Pool
 from pathlib import Path
@@ -36,20 +23,50 @@ def multiprocess_landuse_gid(
         processes: int = 1, # number of processes
         tile_dir: str = './outputs/landuse/',
         resolution: int = 5,
-        db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'},
+        db_params: dict = {'host': 'localhost','port': '5432','database': 'mydb','user': 'myuser','password': 'mypwd'}, # pg database connexion
         queries_dir_path: str = './queries/', # The path to the directory containing the SQL query files
         landcover_tables: list = ['periurbain','foret','prairie_permanente','culture','bati','naturel','infra','banc_de_galets','surfaces_en_eau'], # A list of landcover tables to extract data from
         crs: str = '2154',
         study_area_path:str = './inputs/zone_etude.gpkg'
         ):
-    
-    # pg database connexion
+    """
+    This function extracts the landuse data from a tileset using SQL queries and
+    writes the result to a raster file. It uses multiple processes to speed up the
+    computation. gid start and gid end are the identifiers of the tiles between 
+    which processing is performed.
+
+    Parameters:
+    -----------
+    tileset: str
+        Path to the tileset GeoPackage file.
+    gid_start: int
+        tile starting id.
+    gid_end: int
+        tile end id.
+    processes: int
+        Number of processes to use for parallel execution.
+    tile_dir: str
+        Path to the directory where the output tiles will be saved.
+    resolution: int
+        The resolution of the landuse classification in meters.
+    db_params: dict
+        A dictionary containing the parameters for the database connection.
+        The following keys are required: host, port, database, user, password.
+    queries_dir_path: str
+        The path to the directory containing the SQL query files.
+    landcover_tables: list
+        A list of landcover tables to extract data from.
+    crs: str
+        The EPSG code of the tileset.
+    study_area_path: str
+        Path to the shapefile of the study area.
+
+    Returns:
+    --------
+    None
+    """
 
     def arguments():
-
-        # gdf = geopandas.read_file(tileset)
-        # mask = (gdf['GID'] >= gid_start) & (gdf['GID'] <= gid_end)
-        # tileset = gdf.loc[mask]
         
         for gid in geopandas.read_file(tileset).loc[(geopandas.read_file(tileset)['GID'] >=gid_start) & (geopandas.read_file(tileset)['GID'] <= gid_end), 'GID']:
             yield (
@@ -118,8 +135,6 @@ def multiprocess_landuse(
     --------
     None
     """
-    
-    # pg database connexion
 
     def arguments():
         
@@ -161,7 +176,7 @@ def landuse_tile(
     """
     Extract PostGIS data from a tile.
 
-    :param gid: An integer .
+    :param gid: An integer.
     :param db_con_params: A dictionary containing the parameters required to connect to the PostgreSQL database.
     :param landcover_tables: A list of strings representing the names of the landcover tables to extract data from.
     :param resolution: an integer with the output raster resolution.
